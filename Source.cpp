@@ -2,6 +2,7 @@
 
 #include "VertexBuffer.h"
 #include "VertexArray.h"
+#include "ShaderProgram.h"
 
 /* Lab 4 - Start*/
 // Needs to be defined before the include in exactly
@@ -56,14 +57,14 @@
 //	SET TEXTURE COORDINATES
 //	- 0.0f, 0.0f is top left.
 //*****************************************************
-const GLfloat texCoords[] = {
-	0.0f, 0.0f,
-	1.0f, 0.0f, 
-	0.0f, -1.0f,
-	1.0f, -1.0f,
-	1.0f, 0.0f,
-	0.0f, -1.0f
-};
+//const GLfloat texCoords[] = {
+//	0.0f, 0.0f,
+//	1.0f, 0.0f, 
+//	0.0f, -1.0f,
+//	1.0f, -1.0f,
+//	1.0f, 0.0f,
+//	0.0f, -1.0f
+//};
 
 int main()
 {
@@ -88,7 +89,7 @@ int main()
 	//*****************************************************
 	//	CREATE BUFFER ARRAY
 	//*****************************************************
-	
+
 	// Same thing as: 
 	// VertexBuffer* positionsVbo = new VertexBuffer();
 	//
@@ -103,33 +104,9 @@ int main()
 	positionsVbo->add(glm::vec3(0.5f, 0.5f, 0.0f));
 	positionsVbo->add(glm::vec3(0.5f, -0.5f, 0.0f));
 	positionsVbo->add(glm::vec3(-0.5f, 0.5f, 0.0f));
-	
-	/// OLD
-	//GLuint positionsVboId = 0;
-
-	//// Create a new VBO on the GPU and bind it
-	//glGenBuffers(1, &positionsVboId);
-
-	//if (!positionsVboId)
-	//{
-	//	throw std::exception();
-	//}
-
-	//glBindBuffer(GL_ARRAY_BUFFER, positionsVboId);
-
-	//// Upload a copy of the data from memory into the new VBO
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
-
-	//// Reset the state
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	//*****************************************************
-	//	CREATE COLOURS ARRAY
-	//	- 1 in glVertexAttribPointer = Index
-	//	- 2 in glVertexAttribPointer = Vector
-	//
-	//	- The 1 and 0 in glEnableVertexAttribArray is
-	//	  important when we bind the attribute location.
+	// CREATE TEXTURES ARRAY
 	//*****************************************************
 
 	std::shared_ptr<VertexBuffer> texturesVbo = std::make_shared<VertexBuffer>();
@@ -141,26 +118,6 @@ int main()
 	texturesVbo->add(glm::vec2(1.0f, 0.0f)); 
 	texturesVbo->add(glm::vec2(0.0f, -1.0f));
 
-	//GLuint colorsVboId = 0;
-
-	//// Create a colors VBO on the GPU and bind it
-	//glGenBuffers(1, &colorsVboId);
-
-	//if (!colorsVboId)
-	//{
-	//	throw std::exception();
-	//}
-
-	//glBindBuffer(GL_ARRAY_BUFFER, colorsVboId);
-
-	//// Upload a copy of the data from memory into the new VBO
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(texCoords), texCoords, GL_STATIC_DRAW);
-
-	//// Reset the state
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-
-	
 	//*****************************************************
 	//	CREATE VERTEX ARRAY
 	//*****************************************************
@@ -171,37 +128,9 @@ int main()
 	// path is the file location
 	std::shared_ptr<VertexArray> cat = std::make_shared<VertexArray>("models/curuthers/curuthers.obj");
 
-	//GLuint vaoId = 0;
-
-	//// Create a new VAO on the GPU and bind it
-	//glGenVertexArrays(1, &vaoId);
-
-	//if (!vaoId)
-	//{
-	//	throw std::exception();
-	//}
-
-	//glBindVertexArray(vaoId);
-
-	//// Bind the position VBO, assign it to position 0 on the bound VAO
-	//// and flag it to be used
-	//// Will return the ID and upload it to the graphics card. As and when it is needed. 
-	//// Keeps it in sync. 
-	//glBindBuffer(GL_ARRAY_BUFFER, positionsVbo->getId());
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-	//	3 * sizeof(GLfloat), (void*)0);
-	//glEnableVertexAttribArray(0);
-
-	///******************* Colors */
-	//// Bind the color VBO, assign it to position 1 on the bound VAO
-	//// and flag it to be used
-	//glBindBuffer(GL_ARRAY_BUFFER, texturesVbo->getId());
-
-	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
-	//	2 * sizeof(GLfloat), (void*)0);
-
-	//glEnableVertexAttribArray(1);
-	//glBindVertexArray(0);
+	// New shader program
+	//std::shared_ptr<ShaderProgram> shaderProgram = std::make_shared<ShaderProgram>("sample.vert", "sample.frag");
+	//std::shared_ptr<ShaderProgram> shaderProgram = std::make_shared<ShaderProgram>(vertexShaderSrc, fragmentShaderSrc);
 
 	//*****************************************************
 	//	CREATE VERTEX SHADER
@@ -221,6 +150,8 @@ int main()
 		" v_TexCoord = a_TexCoord;											" \
 		"}																	" \
 		"																	";
+
+
 
 	// The gl_Position transforms the vertex coordinates into world space
 	// and then into screen space
