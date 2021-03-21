@@ -21,50 +21,6 @@
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
-// Define positions
-//const GLfloat positions[] = {
-//  0.0f, 0.5f, 0.0f,
-//  -0.5f, -0.5f, 0.0f,
-//  0.5f, -0.5f, 0.0f,
-//};
-
-//*****************************************************
-//	POSITIONS OF THE QUAD
-//	- Negative = 0, Positive = 1.
-//	- This relates to texCoords.
-//	- Example: -0.5f, -0.5f will be 0.0f, 0.0f in texCoords.
-//*****************************************************
-//const GLfloat positions[] = {
-//  -0.5f, -0.5f, 0.0f,
-//  0.5f, -0.5f, 0.0f,
-//  -0.5f, 0.5f, 0.0f,
-//  0.5f, 0.5f, 0.0f, 
-//  0.5f, -0.5f, 0.0f, 
-//  -0.5f, 0.5f, 0.0f
-//};
-
-//// Define colours
-//const GLfloat colors[] = {
-//  1.0f, 0.0f, 0.0f, 1.0f,
-//  0.0f, 1.0f, 0.0f, 1.0f,
-//  0.0f, 0.0f, 1.0f, 1.0f,
-//  1.0f, 0.0f, 0.0f, 1.0f,
-//  0.0f, 1.0f, 0.0f, 1.0f,
-//  0.0f, 0.0f, 1.0f, 1.0f
-//};
-
-//*****************************************************
-//	SET TEXTURE COORDINATES
-//	- 0.0f, 0.0f is top left.
-//*****************************************************
-//const GLfloat texCoords[] = {
-//	0.0f, 0.0f,
-//	1.0f, 0.0f, 
-//	0.0f, -1.0f,
-//	1.0f, -1.0f,
-//	1.0f, 0.0f,
-//	0.0f, -1.0f
-//};
 
 int main()
 {
@@ -138,21 +94,25 @@ int main()
 	const GLchar* vertexShaderSrc =
 		"attribute vec3 a_Position;														" \
 		"attribute vec2 a_TexCoord;														" \
+		"attribute vec3 a_Normal;														" \
 		"uniform mat4 u_Projection;														" \
 		"uniform mat4 u_Model;															" \
 		"uniform mat4 u_View;															" \
 		"																				" \
 		"																				" \
 		"varying vec2 v_TexCoord;														" \
+		"varying vec3 v_FragPos;														" \
+		"varying vec3 v_Normal;															" \
 		"																				" \
 		"void main()																	" \
 		"{																				" \
+		" v_FragPos = vec3(u_Model * vec4(a_Position, 1.0));							" \
 		" gl_Position = u_Projection * u_View * u_Model * vec4(a_Position, 1.0);		" \
 		" v_TexCoord = a_TexCoord;														" \
+		" v_Normal = vec3(u_Model * vec4(a_Normal, 0));									" \
 		"}																				" \
 		"																				";
 
-	
 	// The gl_Position transforms the vertex coordinates into world space
 	// and then into screen space
 
@@ -173,20 +133,50 @@ int main()
 	//	CREATE FRAGMENT SHADER
 	//*****************************************************
 	const GLchar* fragmentShaderSrc =
-		"uniform sampler2D u_Texture;					" \
-		"varying vec2 v_TexCoord;						" \
-		"uniform float u_Pulse;							" \
-		"												" \
-		"void main()									" \
-		"{												" \
-		" vec4 tex = texture2D(u_Texture, v_TexCoord);	" \
-		" gl_FragColor = tex;							" \
-		"}												";
+		"uniform sampler2D u_Texture;						" \
+		"varying vec2 v_TexCoord;							" \
+		"varying vec3 v_FragPos;							" \
+		"varying vec3 v_Normal;								" \
+		"uniform float u_Pulse;								" \
+		"													" \
+		"void main()										" \
+		"{													" \
+		" vec4 tex = texture2D(u_Texture, v_TexCoord);		" \
+		"													" \
+		" vec3 lightPos = vec3(10, 10, 0);					" \
+		" vec3 norm = normalize(v_Normal);					" \
+		" vec3 lightDir = normalize(lightPos - v_FragPos);	" \
+		"													" \
+		" float diff = max(dot(norm, lightDir), 0.0);		" \
+		" vec3 diffuse = vec3(1, 1, 1) * diff;				" \
+		"													" \
+		"													" \
+		" gl_FragColor = vec4(diffuse, 1.0);				" \
+		"}													";
 	
 	//*****************************************************
-	//	FRAGMENT SHADER DEBUGGING
+	//	FRAGMENT SHADER DEBUGGING & Notes
 	//	- " vec4 tex = texture2D(u_Texture, v_TexCoord); " \
 	//	- " vec4 tex = vec4(v_TexCoord, 0, 1);	" \
+	//  Note:
+	//	For diffuse, set "gl_FragColor = vec4(diffuse, 1);"
+	//	For ambient, set "gl_FragColor = vec4(light, 1) * tex;"
+	//
+	//	Diffuse:
+	//	" vec3 lightPos = vec3(10, 10, 0);					" \
+	//	" vec3 norm = normalize(v_Normal);					" \
+	//	" vec3 lightDir = normalize(lightPos - v_FragPos);	" \
+	//	"													" \
+	//	" float diff = max(dot(norm, lightDir), 0.0);		" \
+	//	" vec3 diffuse = vec3(1, 1, 1) * diff;				" \
+	//	
+	//	Ambient:
+	//	" float ambientStrength = 0.1;						" \
+	//	" vec3 lightColour(0, 1, 0);						" \
+	//	"													" \
+	//	" vec3 ambient = ambientStrength * lightColour;		" \
+	//	" vec3 light = ambient;								" \
+	//
 	//*****************************************************
 
 	// Create a new fragment shader, attach source code, compile it and
@@ -213,6 +203,8 @@ int main()
 	// Ensure the VAO "position" attribute stream gets set as the first position
 	// during the link.
 	glBindAttribLocation(programId, 1, "a_TexCoord");
+
+	glBindAttribLocation(programId, 2, "a_Normal");
 
 	// Perform the link and check for failure
 	glLinkProgram(programId);
@@ -376,7 +368,7 @@ int main()
 		// Prepare the model matrix
 		glm::mat4 model(1.0f);
 		model = glm::translate(model, glm::vec3(0, 0, 0));
-		//model = glm::rotate(model, glm::radians(angle), glm::vec3(0, 1, 0));
+		model = glm::rotate(model, glm::radians(rot), glm::vec3(0, 1, 0));
 		// Upload the model matrix
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
@@ -386,7 +378,7 @@ int main()
 		
 		// If we do rotate then translate, it will look like it will orbit around the model
 		glm::mat4 view(1.0f);
-		view = glm::rotate(view, glm::radians(rot), glm::vec3(0, 1, 0));
+		//view = glm::rotate(view, glm::radians(rot), glm::vec3(0, 1, 0));
 		view = glm::translate(view, glm::vec3(0, 0, 15));
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(glm::inverse(view)));
 
