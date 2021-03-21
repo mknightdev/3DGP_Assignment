@@ -136,23 +136,23 @@ int main()
 	//	CREATE VERTEX SHADER
 	//*****************************************************
 	const GLchar* vertexShaderSrc =
-		"attribute vec3 a_Position;											" \
-		"attribute vec2 a_TexCoord;											" \
-		"uniform mat4 u_Projection;											" \
-		"uniform mat4 u_Model;												" \
-		"																	" \
-		"																	" \
-		"varying vec2 v_TexCoord;											" \
-		"																	" \
-		"void main()														" \
-		"{																	" \
-		" gl_Position = u_Projection * u_Model * vec4(a_Position, 1.0);		" \
-		" v_TexCoord = a_TexCoord;											" \
-		"}																	" \
-		"																	";
+		"attribute vec3 a_Position;														" \
+		"attribute vec2 a_TexCoord;														" \
+		"uniform mat4 u_Projection;														" \
+		"uniform mat4 u_Model;															" \
+		"uniform mat4 u_View;															" \
+		"																				" \
+		"																				" \
+		"varying vec2 v_TexCoord;														" \
+		"																				" \
+		"void main()																	" \
+		"{																				" \
+		" gl_Position = u_Projection * u_View * u_Model * vec4(a_Position, 1.0);		" \
+		" v_TexCoord = a_TexCoord;														" \
+		"}																				" \
+		"																				";
 
-
-
+	
 	// The gl_Position transforms the vertex coordinates into world space
 	// and then into screen space
 
@@ -242,6 +242,7 @@ int main()
 	// Find uniform locations
 	GLint modelLoc = glGetUniformLocation(programId, "u_Model");
 	GLint projectionLoc = glGetUniformLocation(programId, "u_Projection");
+	GLint viewLoc = glGetUniformLocation(programId, "u_View");
 
 	if (modelLoc == -1)
 	{
@@ -307,6 +308,10 @@ int main()
 	float xPos = 0;
 	/* Lab 3 - End */
 
+	float rot = 0;
+	float deltaTime = 0.0001f;
+	float prevTime = 0;
+
 	while (!stopped)
 	{
 		int width = 0;
@@ -326,11 +331,20 @@ int main()
 			}
 		}
 
-		pulse += 0.015f;
+		float currTime = SDL_GetTicks();
+		float diffTime = currTime - prevTime;
+		deltaTime = diffTime / 1000.0f; 
+		// Makes sure it has the latest prev time. Otherwise it will make things go faster and faster
+		prevTime = currTime;	
+
+
+		pulse += 1.0f;
 		if (pulse > 1)
 		{
 			pulse = 0;
 		}
+
+
 
 		// Set background to Red 
 		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
@@ -355,29 +369,44 @@ int main()
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f),
 			(float)width / (float)height, 0.1f, 100.0f);
 
+		//*****************************************************
+		//	MODEL MATRIX
+		//*****************************************************
+
 		// Prepare the model matrix
 		glm::mat4 model(1.0f);
-		model = glm::translate(model, glm::vec3(0, 0, -10.0f));
-		model = glm::rotate(model, glm::radians(angle), glm::vec3(0, 1, 0));
-
-		// Increase the float angle so next frame the triangle rotates further
-		// How fast the object rotates
-		angle += 0.01f;
-
-		// Make sure the current program is bound
-
+		model = glm::translate(model, glm::vec3(0, 0, 0));
+		//model = glm::rotate(model, glm::radians(angle), glm::vec3(0, 1, 0));
 		// Upload the model matrix
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
+		//*****************************************************
+		//	VIEW MATRIX
+		//*****************************************************
+		
+		// If we do rotate then translate, it will look like it will orbit around the model
+		glm::mat4 view(1.0f);
+		view = glm::rotate(view, glm::radians(rot), glm::vec3(0, 1, 0));
+		view = glm::translate(view, glm::vec3(0, 0, 15));
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(glm::inverse(view)));
+
+		// Increase the float angle so next frame the triangle rotates further
+		// How fast the object rotates
+		rot += 45.0f * deltaTime;
+
+		// Make sure the current program is bound
+
+
 		// Upload the projection matrix
-		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE,
-			glm::value_ptr(projection));
+		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 		/* LAB 3 - End */
 
 		// Draw 3 vertices (a triangle)
 		//glDrawArrays(GL_TRIANGLES, 0, 6);
 		// Cat:
 		glDrawArrays(GL_TRIANGLES, 0, cat->getVertCount());
+
+		glDisable(GL_DEPTH_TEST);
 
 		//*****************************************************
 		//	ORTHOGRAPHIC PATH
@@ -398,12 +427,12 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 		// Upload the projection matrix
-		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE,
-			glm::value_ptr(projection));
+		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 		// Draw shape as before
 		// Draw 3 vertices (a triangle)
 		glDrawArrays(GL_TRIANGLES, 0, 6);
+
 
 		//*****************************************************
 		//	RESET THE STATE
