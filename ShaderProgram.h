@@ -4,10 +4,12 @@
 struct ShaderProgram
 {
 public:
-	ShaderProgram(const GLchar* vertShader);	// Constructor
+	ShaderProgram();	// Constructor
 	~ShaderProgram();	// Deconstructor
 	GLuint getId();
 	void createVertexShader(const GLchar* vertShader);
+	GLuint getSource(const GLchar* source, GLuint type);
+	void createShaderProgram(const GLchar* vertSrc, const GLchar* fragSrc);
 
 	/*
 		Need a SOURCE
@@ -19,6 +21,6 @@ public:
 
 private:
 	GLuint id;	// Main program id 
-	GLint success = 0;
+	GLint success;
 
 };

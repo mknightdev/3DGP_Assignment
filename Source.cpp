@@ -122,15 +122,15 @@ int main()
 	//glShaderSource(vertexShaderId, 1, &vertexShaderSrc, NULL);
 	//glCompileShader(vertexShaderId);
 
-	std::shared_ptr<ShaderProgram> vertShader = std::make_shared<ShaderProgram>(vertexShaderSrc);
-	vertShader->createVertexShader(vertexShaderSrc);
-	GLint success = 0;
-	glGetShaderiv(vertShader->getId(), GL_COMPILE_STATUS, &success);
+	//std::shared_ptr<ShaderProgram> shader = std::make_shared<ShaderProgram>(vertexShaderSrc);
+	//shader->getSource(vertexShaderSrc, GL_VERTEX_SHADER);
+	//GLint success = 0;
+	//glGetShaderiv(shader->getId(), GL_COMPILE_STATUS, &success);
 
-	if (!success)
-	{
-		throw std::exception();
-	}
+	//if (!success)
+	//{
+	//	throw std::exception();
+	//}
 
 	//*****************************************************
 	//	CREATE FRAGMENT SHADER
@@ -151,7 +151,7 @@ int main()
 		" vec3 lightDir = normalize(lightPos - v_FragPos);	" \
 		"													" \
 		" float diff = max(dot(norm, lightDir), 0.0);		" \
-		" vec3 diffuse = vec3(1, 1, 1) * diff;				" \
+		" vec3 diffuse = vec3(0, 1, 1) * diff;				" \
 		"													" \
 		"													" \
 		" gl_FragColor = vec4(diffuse, 1.0);				" \
@@ -184,50 +184,55 @@ int main()
 
 	// Create a new fragment shader, attach source code, compile it and
 	// check for errors.
-	GLuint fragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShaderId, 1, &fragmentShaderSrc, NULL);
-	glCompileShader(fragmentShaderId);
-	glGetShaderiv(fragmentShaderId, GL_COMPILE_STATUS, &success);
+	//GLuint fragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
+	//glShaderSource(fragmentShaderId, 1, &fragmentShaderSrc, NULL);
+	//glCompileShader(fragmentShaderId);
+	//glGetShaderiv(fragmentShaderId, GL_COMPILE_STATUS, &success);
 
-	if (!success)
-	{
-		throw std::exception();
-	}
+	//if (!success)
+	//{
+	//	throw std::exception();
+	//}
 
-	// Create shader program
-	// Create new shader program and attach our shader objects
-	GLuint programId = glCreateProgram();
+	//// Create shader program
+	//// Create new shader program and attach our shader objects
+	//GLuint programId = glCreateProgram();
 
-	glBindAttribLocation(programId, 0, "a_Position");
+	//glAttachShader(programId, shader->getId());
+	//glAttachShader(programId, fragmentShaderId);
 
-	glAttachShader(programId, vertShader->getId());
-	glAttachShader(programId, fragmentShaderId);
+	/*glBindAttribLocation(programId, 0, "a_Position");*/
 
 	// Ensure the VAO "position" attribute stream gets set as the first position
 	// during the link.
-	glBindAttribLocation(programId, 1, "a_TexCoord");
+	//glBindAttribLocation(programId, 1, "a_TexCoord");
 
-	glBindAttribLocation(programId, 2, "a_Normal");
+	//glBindAttribLocation(programId, 2, "a_Normal");
 
 	// Perform the link and check for failure
-	glLinkProgram(programId);
-	glGetProgramiv(programId, GL_LINK_STATUS, &success);
+	//glLinkProgram(programId);
+	//glGetProgramiv(programId, GL_LINK_STATUS, &success);
 
-	if (!success)
-	{
-		throw std::exception();
-	}
+	//if (!success)
+	//{
+	//	throw std::exception();
+	//}
 	// Detach and destroy the shader objects. These are no longer needed
 	// because we now have a complete shader program.
-	glDetachShader(programId, vertShader->getId());
-	glDeleteShader(vertShader->getId());
-	glDetachShader(programId, fragmentShaderId);
-	glDeleteShader(fragmentShaderId);
+	//glDetachShader(programId, shader->getId());
+	//glDeleteShader(shader->getId());
+	//glDetachShader(programId, fragmentShaderId);
+	//glDeleteShader(fragmentShaderId);
+
+
+	std::shared_ptr<ShaderProgram> shader = std::make_shared<ShaderProgram>();
+
+	shader->createShaderProgram(vertexShaderSrc, fragmentShaderSrc);
 
 	//*****************************************************
 	//	OBTAIN UNIFORM LOCATION
 	//*****************************************************
-	GLint pulseLoc = glGetUniformLocation(programId, "u_Pulse");
+	GLint pulseLoc = glGetUniformLocation(shader->getId(), "u_Pulse");
 
 	if (pulseLoc == -1)
 	{
@@ -235,9 +240,9 @@ int main()
 	}
 
 	// Find uniform locations
-	GLint modelLoc = glGetUniformLocation(programId, "u_Model");
-	GLint projectionLoc = glGetUniformLocation(programId, "u_Projection");
-	GLint viewLoc = glGetUniformLocation(programId, "u_View");
+	GLint modelLoc = glGetUniformLocation(shader->getId(), "u_Model");
+	GLint projectionLoc = glGetUniformLocation(shader->getId(), "u_Projection");
+	GLint viewLoc = glGetUniformLocation(shader->getId(), "u_View");
 
 	if (modelLoc == -1)
 	{
@@ -339,15 +344,13 @@ int main()
 			pulse = 0;
 		}
 
-
-
 		// Set background to Red 
 		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Drawing
 		// Instruct OpenGL to use our shader program and our VAO
-		glUseProgram(programId);
+		glUseProgram(shader->getId());
 		//glBindVertexArray(vao->getId());
 		// Cat:
 		glBindVertexArray(cat->getId());
