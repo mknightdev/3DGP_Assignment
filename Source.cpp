@@ -118,11 +118,14 @@ int main()
 
 	// Create a new vertex shader, attach source code, compile it and
 	// check for errors.
-	GLuint vertexShaderId = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShaderId, 1, &vertexShaderSrc, NULL);
-	glCompileShader(vertexShaderId);
+	//GLuint vertexShaderId = glCreateShader(GL_VERTEX_SHADER);
+	//glShaderSource(vertexShaderId, 1, &vertexShaderSrc, NULL);
+	//glCompileShader(vertexShaderId);
+
+	std::shared_ptr<ShaderProgram> vertShader = std::make_shared<ShaderProgram>(vertexShaderSrc);
+	vertShader->createVertexShader(vertexShaderSrc);
 	GLint success = 0;
-	glGetShaderiv(vertexShaderId, GL_COMPILE_STATUS, &success);
+	glGetShaderiv(vertShader->getId(), GL_COMPILE_STATUS, &success);
 
 	if (!success)
 	{
@@ -197,7 +200,7 @@ int main()
 
 	glBindAttribLocation(programId, 0, "a_Position");
 
-	glAttachShader(programId, vertexShaderId);
+	glAttachShader(programId, vertShader->getId());
 	glAttachShader(programId, fragmentShaderId);
 
 	// Ensure the VAO "position" attribute stream gets set as the first position
@@ -216,8 +219,8 @@ int main()
 	}
 	// Detach and destroy the shader objects. These are no longer needed
 	// because we now have a complete shader program.
-	glDetachShader(programId, vertexShaderId);
-	glDeleteShader(vertexShaderId);
+	glDetachShader(programId, vertShader->getId());
+	glDeleteShader(vertShader->getId());
 	glDetachShader(programId, fragmentShaderId);
 	glDeleteShader(fragmentShaderId);
 

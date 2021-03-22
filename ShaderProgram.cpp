@@ -1,14 +1,8 @@
 #include "ShaderProgram.h"
 
-
-
-
-ShaderProgram::ShaderProgram(const GLchar* vertShader, const GLchar* fragShader)
+ShaderProgram::ShaderProgram(const GLchar* vertShader)
 {
-	if (!success)
-	{
-		throw std::exception();
-	}
+
 }
 
 ShaderProgram::~ShaderProgram()
@@ -21,18 +15,20 @@ ShaderProgram::~ShaderProgram()
 	//glDeleteShader(fragmentShaderId);
 }
 
+void ShaderProgram::createVertexShader(const GLchar* vertSrc)
+{
+	id = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(id, 1, &vertSrc, NULL);
+	glCompileShader(id);
+}
+
 GLuint ShaderProgram::getId()
 {
 	return id;
 }
 
-void ShaderProgram::createVertShader()
-{
-	id = glCreateShader(GL_VERTEX_SHADER);
-}
 
-void ShaderProgram::createFragShader()
-{
-	id = glCreateShader(GL_FRAGMENT_SHADER);
-}
+
+
+
 
