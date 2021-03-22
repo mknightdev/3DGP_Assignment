@@ -2,25 +2,10 @@
 
 #include <iostream>
 
-ShaderProgram::ShaderProgram()
-{
-}
 
 ShaderProgram::~ShaderProgram()
 {
-	// Detach and destroy the shader objects. These are no longer needed
-	// because we now have a complete shader program.
-	//glDetachShader(programId, vertexShaderId);
-	//glDeleteShader(vertexShaderId);
-	//glDetachShader(programId, fragmentShaderId);
-	//glDeleteShader(fragmentShaderId);
-}
-
-void ShaderProgram::createVertexShader(const GLchar* vertSrc)
-{
-	id = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(id, 1, &vertSrc, NULL);
-	glCompileShader(id);
+	glUseProgram(0);
 }
 
 GLuint ShaderProgram::getId()
@@ -28,15 +13,14 @@ GLuint ShaderProgram::getId()
 	return id;
 }
 
-
 void ShaderProgram::createShaderProgram(const GLchar* vertSrc, const GLchar* fragSrc)
 {
-	GLuint vertShaderID = getSource(vertSrc, GL_VERTEX_SHADER);
-	GLuint fragShaderID = getSource(fragSrc, GL_FRAGMENT_SHADER);
+	GLuint _vertShaderID = getSource(vertSrc, GL_VERTEX_SHADER);
+	GLuint _fragShaderID = getSource(fragSrc, GL_FRAGMENT_SHADER);
 	id = glCreateProgram();
 
-	glAttachShader(id, vertShaderID);
-	glAttachShader(id, fragShaderID);
+	glAttachShader(id, _vertShaderID);
+	glAttachShader(id, _fragShaderID);
 
 	GLint success;
 	glLinkProgram(id);
@@ -52,10 +36,12 @@ void ShaderProgram::createShaderProgram(const GLchar* vertSrc, const GLchar* fra
 	glBindAttribLocation(id, 1, "a_TexCoord");
 	glBindAttribLocation(id, 2, "a_Normal");
 
-	glDetachShader(id, vertShaderID);
-	glDeleteShader(vertShaderID);
-	glDetachShader(id, fragShaderID);
-	glDeleteShader(fragShaderID);
+	glDetachShader(id, _vertShaderID);
+	glDeleteShader(_vertShaderID);
+	glDetachShader(id, _fragShaderID);
+	glDeleteShader(_fragShaderID);
+
+	glUseProgram(id);
 }
 
 GLuint ShaderProgram::getSource(const GLchar* source, GLuint type)

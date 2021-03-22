@@ -165,7 +165,7 @@ int main()
 
 	std::shared_ptr<ShaderProgram> shaderProgram = std::make_shared<ShaderProgram>();
 	shaderProgram->createShaderProgram(vertexShaderSrc, fragmentShaderSrc);
-
+	
 	//*****************************************************
 	//	OBTAIN UNIFORM LOCATION
 	//*****************************************************
