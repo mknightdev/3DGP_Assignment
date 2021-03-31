@@ -84,10 +84,6 @@ int main()
 	// path is the file location
 	std::shared_ptr<VertexArray> cat = std::make_shared<VertexArray>("models/curuthers/curuthers.obj");
 
-	// New shader program
-	//std::shared_ptr<ShaderProgram> shaderProgram = std::make_shared<ShaderProgram>("sample.vert", "sample.frag");
-	//std::shared_ptr<ShaderProgram> shaderProgram = std::make_shared<ShaderProgram>(vertexShaderSrc, fragmentShaderSrc);
-
 	//*****************************************************
 	//	CREATE VERTEX SHADER
 	//*****************************************************
@@ -117,26 +113,34 @@ int main()
 	//	CREATE FRAGMENT SHADER
 	//*****************************************************
 	const GLchar* fragmentShaderSrc =
-		"uniform sampler2D u_Texture;						" \
-		"varying vec2 v_TexCoord;							" \
-		"varying vec3 v_FragPos;							" \
-		"varying vec3 v_Normal;								" \
-		"uniform float u_Pulse;								" \
-		"													" \
-		"void main()										" \
-		"{													" \
-		" vec4 tex = texture2D(u_Texture, v_TexCoord);		" \
-		"													" \
-		" vec3 lightPos = vec3(10, 10, 0);					" \
-		" vec3 norm = normalize(v_Normal);					" \
-		" vec3 lightDir = normalize(lightPos - v_FragPos);	" \
-		"													" \
-		" float diff = max(dot(norm, lightDir), 0.0);		" \
-		" vec3 diffuse = vec3(0, 1, 1) * diff;				" \
-		"													" \
-		"													" \
-		" gl_FragColor = vec4(diffuse, 1.0);				" \
-		"}													";
+		"#version 410\n													" \
+		"uniform sampler2D u_Texture;									" \
+		"varying vec2 v_TexCoord;										" \
+		"varying vec3 v_FragPos;										" \
+		"varying vec3 v_Normal;											" \
+		"uniform float u_Pulse;											" \
+		"uniform mat4 u_View;											" \
+		"																" \
+		"void main()													" \
+		"{																" \
+		" vec4 tex = texture2D(u_Texture, v_TexCoord);					" \
+		"																" \
+		" vec3 lightPos = vec3(10, 10, 0);								" \
+		" vec3 norm = normalize(v_Normal);								" \
+		" vec3 lightDir = normalize(lightPos - v_FragPos);				" \
+		"																" \
+		" float diff = max(dot(norm, lightDir), 0.0);					" \
+		" vec3 diffuse = vec3(0, 1, 1) * diff;							" \
+		"																" \
+		" vec3 viewPos = vec3(inverse(u_View) * vec4(0, 0, 0, 1));		" \
+		" vec3 viewDir = normalize(viewPos - v_FragPos);				" \
+		" vec3 reflectDir = reflect(-lightDir, norm);					" \
+		" float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);	" \
+		" vec3 specular = spec * vec3(1, 1, 1); 						" \
+		" 																" \
+		"																" \
+		" gl_FragColor = vec4(diffuse + specular, 1.0);					" \
+		"}																";
 	
 	//*****************************************************
 	//	FRAGMENT SHADER DEBUGGING & Notes
@@ -145,6 +149,8 @@ int main()
 	//  Note:
 	//	For diffuse, set "gl_FragColor = vec4(diffuse, 1);"
 	//	For ambient, set "gl_FragColor = vec4(light, 1) * tex;"
+	//	For specular, set "gl_FragColor = vec4(diffuse + specular, 1.0);"
+	//	For shininess, 32 is good. 8 makes it look metallic.
 	//
 	//	Diffuse:
 	//	" vec3 lightPos = vec3(10, 10, 0);					" \
@@ -161,10 +167,18 @@ int main()
 	//	" vec3 ambient = ambientStrength * lightColour;		" \
 	//	" vec3 light = ambient;								" \
 	//
+	//	Specular:
+	//	" vec3 viewPos = vec3(0, 0, 15);								" \
+	//	" vec3 viewDir = normalize(viewPos - v_FragPos);				" \
+	//	" vec3 reflectDir = reflect(-lightDir, norm);					" \
+	//	" float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);	" \
+	//	" vec3 specular = spec * vec3(1, 1, 1); 						" \
+	//
 	//*****************************************************
 
 	std::shared_ptr<ShaderProgram> shaderProgram = std::make_shared<ShaderProgram>();
-	shaderProgram->createShaderProgram(vertexShaderSrc, fragmentShaderSrc);
+	shaderProgram->CreateShader(vertexShaderSrc, fragmentShaderSrc);
+	
 	
 	//*****************************************************
 	//	OBTAIN UNIFORM LOCATION
@@ -189,6 +203,10 @@ int main()
 	{
 		throw std::exception();
 	}
+	if (viewLoc == -1)
+	{
+		throw std::exception();
+	}
 
 	//*****************************************************
 	//	LOAD IMAGE
@@ -206,7 +224,8 @@ int main()
 	{
 		throw std::exception();
 	}
-	
+
+
 	//*****************************************************
 	//	UPLOAD TO GPU
 	//*****************************************************
@@ -248,6 +267,11 @@ int main()
 	float rot = 0;
 	float deltaTime = 0.0001f;
 	float prevTime = 0;
+	
+	float pos = 0;
+	float speed = 1.0f;
+
+	glm::vec3 camPos(0, 0, 15);
 
 	while (!stopped)
 	{
@@ -265,6 +289,25 @@ int main()
 			if (event.type == SDL_QUIT)
 			{
 				stopped = true;
+			}
+			else if (event.type == SDL_KEYDOWN)
+			{
+				switch (event.key.keysym.sym)
+				{
+					case SDLK_w:
+						std::cout << "W Key Pressed" << std::endl;
+						camPos.z += 50.0f * deltaTime;
+						break;
+					case SDLK_a:
+						std::cout << "A Key Pressed" << std::endl;
+						break;
+					case SDLK_s:
+						std::cout << "S Key Pressed" << std::endl;
+						break;
+					case SDLK_d:
+						std::cout << "D Key Pressed" << std::endl;
+						break;
+				}
 			}
 		}
 
@@ -310,8 +353,11 @@ int main()
 
 		// Prepare the model matrix
 		glm::mat4 model(1.0f);
-		model = glm::translate(model, glm::vec3(0, 0, 0));
 		model = glm::rotate(model, glm::radians(rot), glm::vec3(0, 1, 0));
+		model = glm::translate(model, glm::vec3(0, 0, 0));
+
+		glm::vec3 diff = glm::vec3(model * glm::vec4(0, 0, 0, 1));
+
 		// Upload the model matrix
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
@@ -322,16 +368,17 @@ int main()
 		// If we do rotate then translate, it will look like it will orbit around the model
 		glm::mat4 view(1.0f);
 		//view = glm::rotate(view, glm::radians(rot), glm::vec3(0, 1, 0));
-		view = glm::translate(view, glm::vec3(0, 0, 15));
+		//view = glm::translate(view, glm::vec3(0, 0, 15));
+		view = glm::translate(view, camPos);
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(glm::inverse(view)));
+
+		//glUniform3f(camPos, )
 
 		// Increase the float angle so next frame the triangle rotates further
 		// How fast the object rotates
 		rot += 45.0f * deltaTime;
 
 		// Make sure the current program is bound
-
-
 		// Upload the projection matrix
 		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 		/* LAB 3 - End */
@@ -348,25 +395,23 @@ int main()
 		//*****************************************************
 
 		// Prepare the orthographic projection matrix (reusing the variable)
-		projection = glm::ortho(0.0f, (float)width, 0.0f,
-			(float)height, 0.0f, 1.0f);
+		projection = glm::ortho(0.0f, (float)WINDOW_HEIGHT, 0.0f, (float)WINDOW_WIDTH, 0.0f, 1.0f);
 
 		// Prepare model matrix. The scale is important because now our triangle
 		// would be the size of a single pixel when mapped to an orthographic
 		// projection.
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(100, height - 100, 0));
+		model = glm::translate(model, glm::vec3(100, /*height - */100, 1));
 		model = glm::scale(model, glm::vec3(100, 100, 1));
 
 		// Upload the model matrix
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
 		// Upload the projection matrix
 		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 		// Draw shape as before
 		// Draw 3 vertices (a triangle)
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDrawArrays(GL_TRIANGLES, 0, cat->getVertCount());
 
 
 		//*****************************************************
