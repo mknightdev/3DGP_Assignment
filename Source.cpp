@@ -98,6 +98,13 @@ int main()
 
 	// path is the file location
 	std::shared_ptr<VertexArray> cat = std::make_shared<VertexArray>(modelSettings);
+	std::shared_ptr<VertexArray> block = std::make_shared<VertexArray>("models/block.obj");
+
+	std::vector<std::shared_ptr<VertexArray>> models;
+
+	models.push_back(cat);
+	models.push_back(block);
+
 
 	//*****************************************************
 	//	CREATE VERTEX SHADER
@@ -286,6 +293,8 @@ int main()
 	float pos = 0;
 	float speed = 1.0f;
 
+	int selector = 0;
+
 	glm::vec3 camPos(0, 0, 15);
 
 	while (!stopped)
@@ -322,6 +331,41 @@ int main()
 					case SDLK_d:
 						std::cout << "D Key Pressed" << std::endl;
 						break;
+					case SDLK_q:
+						std::cout << "Q Key Pressed" << std::endl;
+
+						if (selector == 0)
+						{
+							/* if selector equals zero, set selector to be the value of the end of the model vector,
+							* this prevents us from going out of bounds. */
+							selector = models.size() - 1;
+							std::cout << "Selector: " << selector << std::endl;
+						}
+						else
+						{
+							// Otherwise, continue decreasing selector to view previous models.
+							selector--;
+							std::cout << "Selector: " << selector << std::endl;
+						}
+
+						break;
+					case SDLK_e:
+						std::cout << "E Key Pressed" << std::endl;
+
+						if (selector == models.size() - 1)
+						{
+							/* If selector is the same as our vector of models (-1), 
+							* set selector back to zero so we don't go out of bounds.*/
+							selector = 0;
+							std::cout << "Selector: " << selector << std::endl;
+						}
+						else
+						{
+							// Otherwise, continue increasing selector to view further models. 
+							selector++;
+							std::cout << "Selector: " << selector << std::endl;
+						}
+						break;
 				}
 			}
 		}
@@ -331,7 +375,6 @@ int main()
 		deltaTime = diffTime / 1000.0f; 
 		// Makes sure it has the latest prev time. Otherwise it will make things go faster and faster
 		prevTime = currTime;	
-
 
 		pulse += 1.0f;
 		if (pulse > 1)
@@ -348,7 +391,7 @@ int main()
 		glUseProgram(shaderProgram->getId());
 		//glBindVertexArray(vao->getId());
 		// Cat:
-		glBindVertexArray(cat->getId());
+		glBindVertexArray(models.at(selector)->getId());
 		glBindTexture(GL_TEXTURE_2D, textureId);
 
 		glUniform1f(pulseLoc, pulse);
@@ -401,7 +444,7 @@ int main()
 		// Draw 3 vertices (a triangle)
 		//glDrawArrays(GL_TRIANGLES, 0, 6);
 		// Cat:
-		glDrawArrays(GL_TRIANGLES, 0, cat->getVertCount());
+		glDrawArrays(GL_TRIANGLES, 0, models.at(selector)->getVertCount());
 
 		glDisable(GL_DEPTH_TEST);
 
@@ -426,7 +469,7 @@ int main()
 
 		// Draw shape as before
 		// Draw 3 vertices (a triangle)
-		glDrawArrays(GL_TRIANGLES, 0, cat->getVertCount());
+		glDrawArrays(GL_TRIANGLES, 0, models.at(selector)->getVertCount());
 
 
 		//*****************************************************
