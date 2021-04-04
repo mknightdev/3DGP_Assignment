@@ -17,6 +17,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <memory>
+#include <fstream>
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
@@ -81,8 +82,22 @@ int main()
 	vao->setBuffer(0, positionsVbo);
 	vao->setBuffer(1, texturesVbo);
 
+	// Model destination
+	std::string modelSettings;
+
+	// Model settings
+	std::ifstream readFile("Model_Settings.txt");
+
+	while (readFile >> modelSettings)
+	{
+		std::cout << modelSettings;
+	}
+
+	// Close the file, as it's no longer needed. 
+	readFile.close();
+
 	// path is the file location
-	std::shared_ptr<VertexArray> cat = std::make_shared<VertexArray>("models/curuthers/curuthers.obj");
+	std::shared_ptr<VertexArray> cat = std::make_shared<VertexArray>(modelSettings);
 
 	//*****************************************************
 	//	CREATE VERTEX SHADER
