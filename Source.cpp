@@ -105,7 +105,6 @@ int main()
 	models.push_back(cat);
 	models.push_back(block);
 
-
 	//*****************************************************
 	//	CREATE VERTEX SHADER -- Specular
 	//*****************************************************
@@ -257,11 +256,49 @@ int main()
 	std::shared_ptr<ShaderProgram> shaderProgram2 = std::make_shared<ShaderProgram>();
 	shaderProgram2->CreateShader(vertexShaderSrc2, fragmentShaderSrc2);
 
+	//*****************************************************
+	//	CREATE VERTEX SHADER 3
+	//*****************************************************
+	const GLchar* vertexShaderSrc3 =
+		"attribute vec3 a_Position;														" \
+		"attribute vec2 a_TexCoord;														" \
+		"uniform mat4 u_Projection;														" \
+		"uniform mat4 u_Model;															" \
+		"uniform mat4 u_View;															" \
+		"																				" \
+		"																				" \
+		"varying vec2 v_TexCoord;														" \
+		"																				" \
+		"void main()																	" \
+		"{																				" \
+		" gl_Position = u_Projection * u_View * u_Model * vec4(a_Position, 1.0);		" \
+		" v_TexCoord = a_TexCoord;														" \
+		"}																				" \
+		"																				";
+
+	//*****************************************************
+	//	CREATE FRAGMENT SHADER 3
+	//*****************************************************
+	const GLchar* fragmentShaderSrc3 =
+		"uniform sampler2D u_Texture;									" \
+		"varying vec2 v_TexCoord;										" \
+		"uniform float u_Pulse;											" \
+		"																" \
+		"void main()													" \
+		"{																" \
+		" vec4 tex = texture2D(u_Texture, v_TexCoord);					" \
+		" gl_FragColor = tex;											" \
+		"}																";
+
+	std::shared_ptr<ShaderProgram> shaderProgram3 = std::make_shared<ShaderProgram>();
+	shaderProgram3->CreateShader(vertexShaderSrc3, fragmentShaderSrc3);
+
 	// Vector of Shaders
 	std::vector<std::shared_ptr<ShaderProgram>> shaders;
 
 	shaders.push_back(shaderProgram);
 	shaders.push_back(shaderProgram2);
+	shaders.push_back(shaderProgram3);
 
 	//*****************************************************
 	//	OBTAIN UNIFORM LOCATION
@@ -319,6 +356,34 @@ int main()
 		throw std::exception();
 	}
 
+	//*****************************************************
+	//	OBTAIN UNIFORM LOCATION 3
+	//*****************************************************
+	GLint pulseLoc3 = glGetUniformLocation(shaderProgram3->getId(), "u_Pulse");
+
+	if (pulseLoc3 == -1)
+	{
+		//throw std::exception();
+	}
+
+	// Find uniform locations
+	GLint modelLoc3 = glGetUniformLocation(shaderProgram3->getId(), "u_Model");
+	GLint projectionLoc3 = glGetUniformLocation(shaderProgram3->getId(), "u_Projection");
+	GLint viewLoc3 = glGetUniformLocation(shaderProgram3->getId(), "u_View");
+
+	if (modelLoc3 == -1)
+	{
+		throw std::exception();
+	}
+	if (projectionLoc3 == -1)
+	{
+		throw std::exception();
+	}
+	if (viewLoc3 == -1)
+	{
+		throw std::exception();
+	}
+
 	// VECTORS
 	std::vector<GLint> pulseLocs;
 	std::vector<GLint> modelLocs;
@@ -327,15 +392,19 @@ int main()
 
 	pulseLocs.push_back(pulseLoc);
 	pulseLocs.push_back(pulseLoc2);
+	pulseLocs.push_back(pulseLoc3);
 
 	modelLocs.push_back(modelLoc);
 	modelLocs.push_back(modelLoc2);
+	modelLocs.push_back(modelLoc3);
 
 	projectionLocs.push_back(projectionLoc);
 	projectionLocs.push_back(projectionLoc2);
+	projectionLocs.push_back(projectionLoc3);
 
 	viewLocs.push_back(viewLoc);
 	viewLocs.push_back(viewLoc2);
+	viewLocs.push_back(viewLoc3);
 
 
 	//*****************************************************
@@ -388,10 +457,9 @@ int main()
 	//*****************************************************
 	bool stopped = false;
 	float pulse = 0;
-	/* Lab 3 - Start */
+
 	float angle = 0;
 	float xPos = 0;
-	/* Lab 3 - End */
 
 	float rot = 0;
 	float deltaTime = 0.0001f;
@@ -519,19 +587,20 @@ int main()
 			pulse = 0;
 		}
 
-		// Set background to Red 
+		// Set background to Cyan 
 		glClearColor(0.0f, 0.33f, 0.5f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Drawing
 		// Instruct OpenGL to use our shader program and our VAO
 		glUseProgram(shaders.at(shaderSelector)->getId());
+		//glUseProgram(shaders.at(shaderSelector)->getId());
 		//glBindVertexArray(vao->getId());
 		// Cat:
 		glBindVertexArray(models.at(modelSelector)->getId());
 		glBindTexture(GL_TEXTURE_2D, textureId);
 
-		glUniform1f(pulseLoc, pulse);
+		glUniform1f(pulseLocs.at(shaderSelector), pulse);
 
 		//*****************************************************
 		//	PERSPECTIVE PATH
@@ -554,7 +623,7 @@ int main()
 		glm::vec3 diff = glm::vec3(model * glm::vec4(0, 0, 0, 1));
 
 		// Upload the model matrix
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glUniformMatrix4fv(modelLocs.at(shaderSelector), 1, GL_FALSE, glm::value_ptr(model));
 
 		//*****************************************************
 		//	VIEW MATRIX
@@ -565,9 +634,7 @@ int main()
 		//view = glm::rotate(view, glm::radians(rot), glm::vec3(0, 1, 0));
 		//view = glm::translate(view, glm::vec3(0, 0, 15));
 		view = glm::translate(view, camPos);
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(glm::inverse(view)));
-
-		//glUniform3f(camPos, )
+		glUniformMatrix4fv(viewLocs.at(shaderSelector), 1, GL_FALSE, glm::value_ptr(glm::inverse(view)));
 
 		// Increase the float angle so next frame the triangle rotates further
 		// How fast the object rotates
@@ -575,7 +642,7 @@ int main()
 
 		// Make sure the current program is bound
 		// Upload the projection matrix
-		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(projectionLocs.at(shaderSelector), 1, GL_FALSE, glm::value_ptr(projection));
 		/* LAB 3 - End */
 
 		// Draw 3 vertices (a triangle)
@@ -600,13 +667,13 @@ int main()
 		model = glm::scale(model, glm::vec3(100, 100, 1));
 
 		// Upload the model matrix
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glUniformMatrix4fv(modelLocs.at(shaderSelector), 1, GL_FALSE, glm::value_ptr(model));
 		// Upload the projection matrix
-		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(projectionLocs.at(shaderSelector), 1, GL_FALSE, glm::value_ptr(projection));
 
 		// Draw shape as before
 		// Draw 3 vertices (a triangle)
-		glDrawArrays(GL_TRIANGLES, 0, models.at(modelSelector)->getVertCount());
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		//*****************************************************
 		//	RESET THE STATE
