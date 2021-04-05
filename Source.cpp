@@ -28,7 +28,7 @@ int main()
 	//*****************************************************
 	//	CREATE APPLICATION WINDOW
 	//*****************************************************
-	SDL_Window* window = SDL_CreateWindow("Triangle",
+	SDL_Window* window = SDL_CreateWindow("Model Viewer",
 		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 		WINDOW_WIDTH, WINDOW_HEIGHT,
 		SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
@@ -107,7 +107,7 @@ int main()
 
 
 	//*****************************************************
-	//	CREATE VERTEX SHADER
+	//	CREATE VERTEX SHADER -- Specular
 	//*****************************************************
 	const GLchar* vertexShaderSrc =
 		"attribute vec3 a_Position;														" \
@@ -132,7 +132,7 @@ int main()
 		"																				";
 
 	//*****************************************************
-	//	CREATE FRAGMENT SHADER
+	//	CREATE FRAGMENT SHADER -- Specular
 	//*****************************************************
 	const GLchar* fragmentShaderSrc =
 		"#version 410\n													" \
@@ -201,7 +201,68 @@ int main()
 	std::shared_ptr<ShaderProgram> shaderProgram = std::make_shared<ShaderProgram>();
 	shaderProgram->CreateShader(vertexShaderSrc, fragmentShaderSrc);
 	
-	
+	//*****************************************************
+	//	CREATE VERTEX SHADER 2 -- Diffuse
+	//*****************************************************
+	const GLchar* vertexShaderSrc2 =
+		"attribute vec3 a_Position;														" \
+		"attribute vec2 a_TexCoord;														" \
+		"attribute vec3 a_Normal;														" \
+		"uniform mat4 u_Projection;														" \
+		"uniform mat4 u_Model;															" \
+		"uniform mat4 u_View;															" \
+		"																				" \
+		"																				" \
+		"varying vec2 v_TexCoord;														" \
+		"varying vec3 v_FragPos;														" \
+		"varying vec3 v_Normal;															" \
+		"																				" \
+		"void main()																	" \
+		"{																				" \
+		" v_FragPos = vec3(u_Model * vec4(a_Position, 1.0));							" \
+		" gl_Position = u_Projection * u_View * u_Model * vec4(a_Position, 1.0);		" \
+		" v_TexCoord = a_TexCoord;														" \
+		" v_Normal = vec3(u_Model * vec4(a_Normal, 0));									" \
+		"}																				" \
+		"																				";
+
+	//*****************************************************
+	//	CREATE FRAGMENT SHADER 2 -- Diffuse
+	//*****************************************************
+	const GLchar* fragmentShaderSrc2 =
+		"#version 410\n													" \
+		"uniform sampler2D u_Texture;									" \
+		"varying vec2 v_TexCoord;										" \
+		"varying vec3 v_FragPos;										" \
+		"varying vec3 v_Normal;											" \
+		"uniform float u_Pulse;											" \
+		"uniform mat4 u_View;											" \
+		"																" \
+		"void main()													" \
+		"{																" \
+		" vec4 tex = texture2D(u_Texture, v_TexCoord);					" \
+		"																" \
+		" vec3 lightPos = vec3(10, 10, 0);								" \
+		" vec3 norm = normalize(v_Normal);								" \
+		" vec3 lightDir = normalize(lightPos - v_FragPos);				" \
+		"																" \
+		" float diff = max(dot(norm, lightDir), 0.0);					" \
+		" vec3 diffuse = vec3(1, 1, 0) * diff;							" \
+		"																" \
+		" 																" \
+		"																" \
+		" gl_FragColor = vec4(diffuse, 1.0);							" \
+		"}																";
+
+	std::shared_ptr<ShaderProgram> shaderProgram2 = std::make_shared<ShaderProgram>();
+	shaderProgram2->CreateShader(vertexShaderSrc2, fragmentShaderSrc2);
+
+	// Vector of Shaders
+	std::vector<std::shared_ptr<ShaderProgram>> shaders;
+
+	shaders.push_back(shaderProgram);
+	shaders.push_back(shaderProgram2);
+
 	//*****************************************************
 	//	OBTAIN UNIFORM LOCATION
 	//*****************************************************
@@ -231,6 +292,53 @@ int main()
 	}
 
 	//*****************************************************
+	//	OBTAIN UNIFORM LOCATION 2
+	//*****************************************************
+	GLint pulseLoc2 = glGetUniformLocation(shaderProgram2->getId(), "u_Pulse");
+
+	if (pulseLoc2 == -1)
+	{
+		//throw std::exception();
+	}
+
+	// Find uniform locations
+	GLint modelLoc2 = glGetUniformLocation(shaderProgram2->getId(), "u_Model");
+	GLint projectionLoc2 = glGetUniformLocation(shaderProgram2->getId(), "u_Projection");
+	GLint viewLoc2 = glGetUniformLocation(shaderProgram2->getId(), "u_View");
+
+	if (modelLoc2 == -1)
+	{
+		throw std::exception();
+	}
+	if (projectionLoc2 == -1)
+	{
+		throw std::exception();
+	}
+	if (viewLoc2 == -1)
+	{
+		throw std::exception();
+	}
+
+	// VECTORS
+	std::vector<GLint> pulseLocs;
+	std::vector<GLint> modelLocs;
+	std::vector<GLint> projectionLocs;
+	std::vector<GLint> viewLocs;
+
+	pulseLocs.push_back(pulseLoc);
+	pulseLocs.push_back(pulseLoc2);
+
+	modelLocs.push_back(modelLoc);
+	modelLocs.push_back(modelLoc2);
+
+	projectionLocs.push_back(projectionLoc);
+	projectionLocs.push_back(projectionLoc2);
+
+	viewLocs.push_back(viewLoc);
+	viewLocs.push_back(viewLoc2);
+
+
+	//*****************************************************
 	//	LOAD IMAGE
 	//	- File needs to be placed next to the project file. 
 	//*****************************************************
@@ -246,7 +354,6 @@ int main()
 	{
 		throw std::exception();
 	}
-
 
 	//*****************************************************
 	//	UPLOAD TO GPU
@@ -293,7 +400,8 @@ int main()
 	float pos = 0;
 	float speed = 1.0f;
 
-	int selector = 0;
+	int modelSelector = 0;
+	int shaderSelector = 0;
 
 	glm::vec3 camPos(0, 0, 15);
 
@@ -322,48 +430,77 @@ int main()
 						std::cout << "W Key Pressed" << std::endl;
 						camPos.z += 50.0f * deltaTime;
 						break;
-					case SDLK_a:
-						std::cout << "A Key Pressed" << std::endl;
-						break;
 					case SDLK_s:
 						std::cout << "S Key Pressed" << std::endl;
 						break;
-					case SDLK_d:
-						std::cout << "D Key Pressed" << std::endl;
-						break;
-					case SDLK_q:
-						std::cout << "Q Key Pressed" << std::endl;
+					case SDLK_a:
+						std::cout << "A Key Pressed" << std::endl;
 
-						if (selector == 0)
+						if (modelSelector == 0)
 						{
 							/* if selector equals zero, set selector to be the value of the end of the model vector,
 							* this prevents us from going out of bounds. */
-							selector = models.size() - 1;
-							std::cout << "Selector: " << selector << std::endl;
+							modelSelector = models.size() - 1;
+							std::cout << "Model Selector: " << modelSelector << std::endl;
 						}
 						else
 						{
 							// Otherwise, continue decreasing selector to view previous models.
-							selector--;
-							std::cout << "Selector: " << selector << std::endl;
+							modelSelector--;
+							std::cout << "Model Selector: " << modelSelector << std::endl;
+						}
+
+						break;
+					case SDLK_d:
+						std::cout << "D Key Pressed" << std::endl;
+
+						if (modelSelector == models.size() - 1)
+						{
+							/* If selector is the same as our vector of models (-1), 
+							* set selector back to zero so we don't go out of bounds.*/
+							modelSelector = 0;
+							std::cout << "Model Selector: " << modelSelector << std::endl;
+						}
+						else
+						{
+							// Otherwise, continue increasing selector to view further models. 
+							modelSelector++;
+							std::cout << "Model Selector: " << modelSelector << std::endl;
+						}
+						break;
+					case SDLK_q:
+						std::cout << "Q Key Pressed" << std::endl;
+
+						if (shaderSelector == 0)
+						{
+							/* if selector equals zero, set selector to be the value of the end of the shader vector,
+							* this prevents us from going out of bounds. */
+							shaderSelector = shaders.size() - 1;
+							std::cout << "Selector: " << shaderSelector << std::endl;
+						}
+						else
+						{
+							// Otherwise, continue decreasing selector to view previous shader.
+							shaderSelector--;
+							std::cout << "Selector: " << shaderSelector << std::endl;
 						}
 
 						break;
 					case SDLK_e:
 						std::cout << "E Key Pressed" << std::endl;
 
-						if (selector == models.size() - 1)
+						if (shaderSelector == shaders.size() - 1)
 						{
-							/* If selector is the same as our vector of models (-1), 
+							/* If selector is the same as our vector of shader (-1),
 							* set selector back to zero so we don't go out of bounds.*/
-							selector = 0;
-							std::cout << "Selector: " << selector << std::endl;
+							shaderSelector = 0;
+							std::cout << "Selector: " << shaderSelector << std::endl;
 						}
 						else
 						{
-							// Otherwise, continue increasing selector to view further models. 
-							selector++;
-							std::cout << "Selector: " << selector << std::endl;
+							// Otherwise, continue increasing selector to view further shader. 
+							shaderSelector++;
+							std::cout << "Selector: " << shaderSelector << std::endl;
 						}
 						break;
 				}
@@ -383,15 +520,15 @@ int main()
 		}
 
 		// Set background to Red 
-		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(0.0f, 0.33f, 0.5f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Drawing
 		// Instruct OpenGL to use our shader program and our VAO
-		glUseProgram(shaderProgram->getId());
+		glUseProgram(shaders.at(shaderSelector)->getId());
 		//glBindVertexArray(vao->getId());
 		// Cat:
-		glBindVertexArray(models.at(selector)->getId());
+		glBindVertexArray(models.at(modelSelector)->getId());
 		glBindTexture(GL_TEXTURE_2D, textureId);
 
 		glUniform1f(pulseLoc, pulse);
@@ -444,7 +581,7 @@ int main()
 		// Draw 3 vertices (a triangle)
 		//glDrawArrays(GL_TRIANGLES, 0, 6);
 		// Cat:
-		glDrawArrays(GL_TRIANGLES, 0, models.at(selector)->getVertCount());
+		glDrawArrays(GL_TRIANGLES, 0, models.at(modelSelector)->getVertCount());
 
 		glDisable(GL_DEPTH_TEST);
 
@@ -469,8 +606,7 @@ int main()
 
 		// Draw shape as before
 		// Draw 3 vertices (a triangle)
-		glDrawArrays(GL_TRIANGLES, 0, models.at(selector)->getVertCount());
-
+		glDrawArrays(GL_TRIANGLES, 0, models.at(modelSelector)->getVertCount());
 
 		//*****************************************************
 		//	RESET THE STATE
