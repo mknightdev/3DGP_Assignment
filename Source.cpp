@@ -90,7 +90,7 @@ int main()
 
 	while (readFile >> modelSettings)
 	{
-		std::cout << modelSettings;
+		std::cout << modelSettings << std::endl;
 	}
 
 	// Close the file, as it's no longer needed. 
@@ -98,12 +98,12 @@ int main()
 
 	// path is the file location
 	std::shared_ptr<VertexArray> cat = std::make_shared<VertexArray>(modelSettings);
-	std::shared_ptr<VertexArray> block = std::make_shared<VertexArray>("models/block.obj");
+	std::shared_ptr<VertexArray> skeleton = std::make_shared<VertexArray>("models/skeleton/skeleton.obj");
 
 	std::vector<std::shared_ptr<VertexArray>> models;
 
 	models.push_back(cat);
-	models.push_back(block);
+	models.push_back(skeleton);
 
 	//*****************************************************
 	//	CREATE VERTEX SHADER -- Specular
@@ -417,7 +417,8 @@ int main()
 
 	//unsigned char* data = stbi_load("image.png", &w, &h, NULL, 4);
 	// Cat: 
-	unsigned char* data = stbi_load("models/curuthers/Whiskers_diffuse.png", &w, &h, NULL, 4);
+	// TODO: SWAP BETWEEN TEXTURES WHEN SWAPPING BETWEEN MODELS
+	unsigned char* data = stbi_load("models/skeleton/skeleton_diffuse.png", &w, &h, NULL, 4);
 
 	if (!data)
 	{
@@ -460,6 +461,7 @@ int main()
 
 	float angle = 0;
 	float xPos = 0;
+	float yPos = 1;
 
 	float rot = 0;
 	float deltaTime = 0.0001f;
@@ -470,6 +472,9 @@ int main()
 
 	int modelSelector = 0;
 	int shaderSelector = 0;
+
+	float scale = 1.0f;
+
 
 	glm::vec3 camPos(0, 0, 15);
 
@@ -494,13 +499,6 @@ int main()
 			{
 				switch (event.key.keysym.sym)
 				{
-					case SDLK_w:
-						std::cout << "W Key Pressed" << std::endl;
-						camPos.z += 50.0f * deltaTime;
-						break;
-					case SDLK_s:
-						std::cout << "S Key Pressed" << std::endl;
-						break;
 					case SDLK_a:
 						std::cout << "A Key Pressed" << std::endl;
 
@@ -571,6 +569,45 @@ int main()
 							std::cout << "Selector: " << shaderSelector << std::endl;
 						}
 						break;
+					case SDLK_UP:
+						// Move the model up
+						std::cout << "UP Arrow" << std::endl;
+						camPos.y -= 50.0f * deltaTime;
+						break;
+					case SDLK_DOWN:
+						// Move the model down
+						std::cout << "DOWN Arrow" << std::endl;
+						camPos.y += 50.0f * deltaTime;
+						break;
+					case SDLK_LEFT:
+						// Move the model left
+						std::cout << "LEFT Arrow" << std::endl;
+						camPos.x += 50.0f * deltaTime;
+						break;
+					case SDLK_RIGHT:
+						// Move the model right
+						std::cout << "RIGHT Arrow" << std::endl;
+						camPos.x -= 50.0f * deltaTime;
+						break;
+					case SDLK_EQUALS:
+						std::cout << "Scale Increased" << std::endl;
+						scale += 0.05f;
+						break;
+					case SDLK_MINUS:
+						std::cout << "Scale Decreased" << std::endl;
+						if (scale <= 0.05f)
+						{
+							scale = 0.05f;
+						}
+						else
+						{
+							scale -= 0.05f;
+						}
+						std::cout << scale << std::endl;
+						break;
+					default:
+						std::cout << "No valid input" << std::endl;
+						break;
 				}
 			}
 		}
@@ -619,6 +656,7 @@ int main()
 		glm::mat4 model(1.0f);
 		model = glm::rotate(model, glm::radians(rot), glm::vec3(0, 1, 0));
 		model = glm::translate(model, glm::vec3(0, 0, 0));
+		model = glm::scale(model, glm::vec3(scale, scale, scale));
 
 		glm::vec3 diff = glm::vec3(model * glm::vec4(0, 0, 0, 1));
 
