@@ -13,6 +13,7 @@ VertexArray::VertexArray(std::string path)
 
 VertexArray::VertexArray()
 {
+	vertCount = 6;
 	// Create a new VAO on the GPU and bind it
 	glGenVertexArrays(1, &id);
 
