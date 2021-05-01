@@ -55,12 +55,15 @@ int main()
 	std::shared_ptr<VertexBuffer> positionsVbo = std::make_shared<VertexBuffer>();
 
 	// Added to data vector (floats)
-	positionsVbo->add(glm::vec3(-0.5f, -0.5f, 0.0f));
-	positionsVbo->add(glm::vec3(0.5f, -0.5f, 0.0f));
-	positionsVbo->add(glm::vec3(-0.5f, 0.5f, 0.0f));
-	positionsVbo->add(glm::vec3(0.5f, 0.5f, 0.0f));
-	positionsVbo->add(glm::vec3(0.5f, -0.5f, 0.0f));
-	positionsVbo->add(glm::vec3(-0.5f, 0.5f, 0.0f));
+	// Tri 1
+	positionsVbo->add(glm::vec3(-0.5f, -0.5f, 0.0f));	// Bottom Left
+	positionsVbo->add(glm::vec3(0.5f, -0.5f, 0.0f));	// Bottom Right
+	positionsVbo->add(glm::vec3(-0.5f, 0.5f, 0.0f));	// Top Right
+
+	// Tri 2
+	positionsVbo->add(glm::vec3(0.5f, 0.5f, 0.0f));		// Top Right
+	positionsVbo->add(glm::vec3(0.5f, -0.5f, 0.0f));	// Bottom Right
+	positionsVbo->add(glm::vec3(-0.5f, 0.5f, 0.0f));	// Top Left
 
 	//*****************************************************
 	// CREATE TEXTURES ARRAY
@@ -68,16 +71,12 @@ int main()
 
 	std::shared_ptr<VertexBuffer> texturesVbo = std::make_shared<VertexBuffer>();
 
-	// Quad
-	// Tri 1
-	texturesVbo->add(glm::vec2(0.0f, 0.0f));	// Bottom Left
-	texturesVbo->add(glm::vec2(1.0f, 0.0f));	// Bottom Right
-	texturesVbo->add(glm::vec2(0.0f, -1.0f));	//  
-	// Tri 2
-	texturesVbo->add(glm::vec2(1.0f, -1.0f));	// 
-	texturesVbo->add(glm::vec2(1.0f, 0.0f));	// 
-	texturesVbo->add(glm::vec2(0.0f, -1.0f));	//
-
+	texturesVbo->add(glm::vec2(0.0f, 0.0f));
+	texturesVbo->add(glm::vec2(1.0f, 0.0f));
+	texturesVbo->add(glm::vec2(0.0f, -1.0f));
+	texturesVbo->add(glm::vec2(1.0f, -1.0f));
+	texturesVbo->add(glm::vec2(1.0f, 0.0f));
+	texturesVbo->add(glm::vec2(0.0f, -1.0f));
 
 	//*****************************************************
 	//	CREATE VERTEX ARRAY
@@ -307,14 +306,13 @@ int main()
 		"attribute vec2 a_TexCoord;														" \
 		"uniform mat4 u_Projection;														" \
 		"uniform mat4 u_Model;															" \
-		"uniform mat4 u_View;															" \
 		"																				" \
 		"																				" \
 		"varying vec2 v_TexCoord;														" \
 		"																				" \
 		"void main()																	" \
 		"{																				" \
-		" gl_Position = u_Projection * u_View * u_Model * vec4(a_Position, 1.0);		" \
+		" gl_Position = u_Projection * u_Model * vec4(a_Position, 1.0);		" \
 		" v_TexCoord = a_TexCoord;														" \
 		"}																				" \
 		"																				";
@@ -442,17 +440,12 @@ int main()
 	// Find uniform locations
 	GLint modelLocUI = glGetUniformLocation(shaderProgramUI->getId(), "u_Model");
 	GLint projectionLocUI = glGetUniformLocation(shaderProgramUI->getId(), "u_Projection");
-	GLint viewLocUI = glGetUniformLocation(shaderProgramUI->getId(), "u_View");
 
 	if (modelLocUI == -1)
 	{
 		throw std::exception();
 	}
 	if (projectionLocUI == -1)
-	{
-		throw std::exception();
-	}
-	if (viewLocUI == -1)
 	{
 		throw std::exception();
 	}
@@ -491,7 +484,7 @@ int main()
 	//unsigned char* data = stbi_load("image.png", &w, &h, NULL, 4);
 	// Cat: 
 	// TODO: SWAP BETWEEN TEXTURES WHEN SWAPPING BETWEEN MODELS
-	unsigned char* data = stbi_load("models/curuthers/Whiskers_diffuse.png", &w, &h, NULL, 4);
+	unsigned char* data = stbi_load("models/croc/croc_diffuse.png", &w, &h, NULL, 4);
 
 	if (!data)
 	{
@@ -757,6 +750,9 @@ int main()
 		//glDrawArrays(GL_TRIANGLES, 0, 6);
 		// Cat:
 		glDrawArrays(GL_TRIANGLES, 0, models.at(modelSelector)->getVertCount());
+		
+		//glBindVertexArray(0);
+		glBindVertexArray(vao->getId());
 
 		//*****************************************************
 		//	ORTHOGRAPHIC PATH
@@ -770,8 +766,8 @@ int main()
 		// would be the size of a single pixel when mapped to an orthographic
 		// projection.
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(100, height - 200, 0));	// Position of the orthographic view
-		model = glm::scale(model, glm::vec3(50, 50, 0));
+		model = glm::translate(model, glm::vec3(100, height - 100, 0));	// Position of the orthographic view
+		model = glm::scale(model, glm::vec3(100, 100, 0));
 
 		// Upload the model matrix
 		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(model));
@@ -782,7 +778,7 @@ int main()
 
 		// Draw shape as before
 		// Draw 3 vertices (a triangle)
-		glDrawArrays(GL_TRIANGLES, 0, models.at(modelSelector)->getVertCount());
+		glDrawArrays(GL_TRIANGLES, 0, vao->getVertCount());
 
 		glDisable(GL_DEPTH_TEST);
 
