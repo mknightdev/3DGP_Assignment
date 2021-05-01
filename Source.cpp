@@ -758,8 +758,6 @@ int main()
 		// Cat:
 		glDrawArrays(GL_TRIANGLES, 0, models.at(modelSelector)->getVertCount());
 
-		glDisable(GL_DEPTH_TEST);
-
 		//*****************************************************
 		//	ORTHOGRAPHIC PATH
 		//*****************************************************
@@ -773,18 +771,20 @@ int main()
 		// projection.
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(100, height - 100, 0));
-		model = glm::scale(model, glm::vec3(50, 50, 1));
+		model = glm::scale(model, glm::vec3(100, 100, 1));
 
 		// Upload the model matrix
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(model));
 
 		// Upload the projection matrix
-		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE,
+		glUniformMatrix4fv(projectionLocUI, 1, GL_FALSE,
 			glm::value_ptr(projection));
 
 		// Draw shape as before
 		// Draw 3 vertices (a triangle)
-		glDrawArrays(GL_TRIANGLES, 0, vao->getVertCount());
+		glDrawArrays(GL_TRIANGLES, 0, cat->getVertCount());
+
+		glDisable(GL_DEPTH_TEST);
 
 		//*****************************************************
 		//	RESET THE STATE
