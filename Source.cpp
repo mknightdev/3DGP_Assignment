@@ -103,11 +103,13 @@ int main()
 	// path is the file location
 	std::shared_ptr<VertexArray> cat = std::make_shared<VertexArray>(modelSettings);
 	std::shared_ptr<VertexArray> skeleton = std::make_shared<VertexArray>("models/skeleton/skeleton.obj");
+	std::shared_ptr<VertexArray> croc = std::make_shared<VertexArray>("models/croc/croc.obj");
 
 	std::vector<std::shared_ptr<VertexArray>> models;
 
 	models.push_back(cat);
 	models.push_back(skeleton);
+	models.push_back(croc);
 
 	//*****************************************************
 	//	[VERT SHADER] SPECULAR LIGHTING
@@ -489,7 +491,7 @@ int main()
 	//unsigned char* data = stbi_load("image.png", &w, &h, NULL, 4);
 	// Cat: 
 	// TODO: SWAP BETWEEN TEXTURES WHEN SWAPPING BETWEEN MODELS
-	unsigned char* data = stbi_load("models/skeleton/skeleton_diffuse.png", &w, &h, NULL, 4);
+	unsigned char* data = stbi_load("models/curuthers/Whiskers_diffuse.png", &w, &h, NULL, 4);
 
 	if (!data)
 	{
@@ -718,30 +720,28 @@ int main()
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f),
 			(float)width / (float)height, 0.1f, 100.0f);
 
-		//*****************************************************
-		//	MODEL MATRIX
-		//*****************************************************
+
+		//	MODEL MATRIX  //
 
 		// Prepare the model matrix
 		glm::mat4 model(1.0f);
-		model = glm::rotate(model, glm::radians(rot), glm::vec3(0, 1, 0));
-		model = glm::translate(model, glm::vec3(0, 0, 0));
+		//model = glm::rotate(model, glm::radians(rot), glm::vec3(0, 1, 0));
+		model = glm::translate(model, glm::vec3(0, 0, -15));
 		model = glm::scale(model, glm::vec3(scale, scale, scale));
 
-		glm::vec3 diff = glm::vec3(model * glm::vec4(0, 0, 0, 1));
+		//glm::vec3 diff = glm::vec3(model * glm::vec4(0, 0, 0, 1));
 
 		// Upload the model matrix
 		glUniformMatrix4fv(modelLocs.at(shaderSelector), 1, GL_FALSE, glm::value_ptr(model));
 
-		//*****************************************************
-		//	VIEW MATRIX
-		//*****************************************************
+
+		//	VIEW MATRIX  //
 
 		// If we do rotate then translate, it will look like it will orbit around the model
 		glm::mat4 view(1.0f);
 		//view = glm::rotate(view, glm::radians(rot), glm::vec3(0, 1, 0));
 		//view = glm::translate(view, glm::vec3(0, 0, 15));
-		view = glm::translate(view, camPos);
+		//view = glm::translate(view, camPos);
 		glUniformMatrix4fv(viewLocs.at(shaderSelector), 1, GL_FALSE, glm::value_ptr(glm::inverse(view)));
 
 		// Increase the float angle so next frame the triangle rotates further
@@ -770,8 +770,8 @@ int main()
 		// would be the size of a single pixel when mapped to an orthographic
 		// projection.
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(100, height - 100, 0));
-		model = glm::scale(model, glm::vec3(100, 100, 1));
+		model = glm::translate(model, glm::vec3(100, height - 200, 0));	// Position of the orthographic view
+		model = glm::scale(model, glm::vec3(50, 50, 0));
 
 		// Upload the model matrix
 		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(model));
@@ -782,7 +782,7 @@ int main()
 
 		// Draw shape as before
 		// Draw 3 vertices (a triangle)
-		glDrawArrays(GL_TRIANGLES, 0, cat->getVertCount());
+		glDrawArrays(GL_TRIANGLES, 0, models.at(modelSelector)->getVertCount());
 
 		glDisable(GL_DEPTH_TEST);
 
