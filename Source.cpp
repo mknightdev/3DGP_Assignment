@@ -22,6 +22,32 @@
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
+bool intersect(glm::vec2 mouse, glm::vec4 rectangle)
+{
+	if (mouse.x < rectangle.x)
+	{
+		return false;
+	}
+	
+	if (mouse.x > rectangle.x + rectangle.z)
+	{
+		return false;
+	}
+
+	if (mouse.y < rectangle.y)
+	{
+		return false;
+	}
+
+	// W is for vec4 height
+	if (mouse.y > rectangle.y + rectangle.w)
+	{
+		return false;
+	}
+	return true;
+}
+
+
 
 int main()
 {
@@ -146,6 +172,7 @@ int main()
 		"varying vec3 v_Normal;											" \
 		"uniform float u_Pulse;											" \
 		"uniform mat4 u_View;											" \
+		"uniform mat4 u_InverseView;											" \
 		"																" \
 		"void main()													" \
 		"{																" \
@@ -158,14 +185,14 @@ int main()
 		" float diff = max(dot(norm, lightDir), 0.0);					" \
 		" vec3 diffuse = vec3(0, 1, 1) * diff;							" \
 		"																" \
-		" vec3 viewPos = vec3(inverse(u_View) * vec4(0, 0, 0, 1));		" \
+		" vec3 viewPos = vec3(u_InverseView * vec4(0, 0, 0, 1));		" \
 		" vec3 viewDir = normalize(viewPos - v_FragPos);				" \
 		" vec3 reflectDir = reflect(-lightDir, norm);					" \
 		" float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);	" \
 		" vec3 specular = spec * vec3(1, 1, 1); 						" \
 		" 																" \
 		"																" \
-		" gl_FragColor = vec4(diffuse + specular, 1.0);					" \
+		" gl_FragColor = vec4(diffuse + specular, 1.0) * tex;					" \
 		"}																";
 
 	//*****************************************************
@@ -357,6 +384,7 @@ int main()
 	GLint modelLoc = glGetUniformLocation(shaderProgram->getId(), "u_Model");
 	GLint projectionLoc = glGetUniformLocation(shaderProgram->getId(), "u_Projection");
 	GLint viewLoc = glGetUniformLocation(shaderProgram->getId(), "u_View");
+	GLint inverseViewLoc = glGetUniformLocation(shaderProgram->getId(), "u_InverseView");
 
 	if (modelLoc == -1)
 	{
@@ -367,6 +395,10 @@ int main()
 		throw std::exception();
 	}
 	if (viewLoc == -1)
+	{
+		throw std::exception();
+	}
+	if (inverseViewLoc == -1)
 	{
 		throw std::exception();
 	}
@@ -450,11 +482,13 @@ int main()
 		throw std::exception();
 	}
 
+
 	// VECTORS
 	std::vector<GLint> pulseLocs;
 	std::vector<GLint> modelLocs;
 	std::vector<GLint> projectionLocs;
 	std::vector<GLint> viewLocs;
+	std::vector<GLint> inverseViewLocs;
 
 	pulseLocs.push_back(pulseLoc);
 	pulseLocs.push_back(pulseLoc2);
@@ -472,6 +506,10 @@ int main()
 	viewLocs.push_back(viewLoc2);
 	viewLocs.push_back(viewLoc3);
 
+	inverseViewLocs.push_back(inverseViewLoc);
+	inverseViewLocs.push_back(-1);
+	inverseViewLocs.push_back(-1);
+
 
 	//*****************************************************
 	//	[IMAGE] LOAD 
@@ -484,7 +522,8 @@ int main()
 	//unsigned char* data = stbi_load("image.png", &w, &h, NULL, 4);
 	// Cat: 
 	// TODO: SWAP BETWEEN TEXTURES WHEN SWAPPING BETWEEN MODELS
-	unsigned char* data = stbi_load("models/croc/croc_diffuse.png", &w, &h, NULL, 4);
+
+	unsigned char* data = stbi_load("models/curuthers/Whiskers_diffuse.png", &w, &h, NULL, 4);
 
 	if (!data)
 	{
@@ -512,6 +551,7 @@ int main()
 
 	// Free the loaded data because we now have a copy on the GPU
 	free(data);
+
 
 	// Generate Mipmap so the texture can be mapped correctly
 	glGenerateMipmap(GL_TEXTURE_2D);
@@ -542,6 +582,9 @@ int main()
 	float scale = 1.0f;
 
 	glm::vec3 camPos(0, 0, 15);
+
+	glm::vec2 mouse(0, 0);
+	bool mouseButtonDown = false;
 
 	while (!stopped)
 	{
@@ -676,7 +719,22 @@ int main()
 					break;
 				}
 			}
+			else if (event.type == SDL_MOUSEMOTION)
+			{
+				mouse = glm::vec2(event.motion.x, event.motion.y);
+				
+			}
+			else if (event.type == SDL_MOUSEBUTTONDOWN)
+			{
+				mouseButtonDown = true;
+			}
+			else if (event.type == SDL_MOUSEBUTTONUP)
+			{
+				mouseButtonDown = false;
+			}
 		}
+
+
 
 		float currTime = SDL_GetTicks();
 		float diffTime = currTime - prevTime;
@@ -690,6 +748,13 @@ int main()
 			pulse = 0;
 		}
 
+		// Update
+		if (intersect(mouse, glm::vec4(50, 50, 100, 100)) && mouseButtonDown)
+		{
+			std::cout << "Intersect True" << std::endl; 
+			mouseButtonDown = false;
+		}
+
 		// Set background to Cyan 
 		glClearColor(0.0f, 0.33f, 0.5f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -701,7 +766,8 @@ int main()
 		// Cat:
 		glBindVertexArray(models.at(modelSelector)->getId());
 		glBindTexture(GL_TEXTURE_2D, textureId);
-
+		//glBindTexture(GL_TEXTURE_2D, textures->getId());
+	
 		//glUniform1f(pulseLocs.at(shaderSelector), pulse);
 
 		//*****************************************************
@@ -719,7 +785,7 @@ int main()
 		// Prepare the model matrix
 		glm::mat4 model(1.0f);
 		//model = glm::rotate(model, glm::radians(rot), glm::vec3(0, 1, 0));
-		model = glm::translate(model, glm::vec3(0, 0, -15));
+		model = glm::translate(model, glm::vec3(0, 0, 0));
 		model = glm::scale(model, glm::vec3(scale, scale, scale));
 
 		//glm::vec3 diff = glm::vec3(model * glm::vec4(0, 0, 0, 1));
@@ -732,10 +798,15 @@ int main()
 
 		// If we do rotate then translate, it will look like it will orbit around the model
 		glm::mat4 view(1.0f);
-		//view = glm::rotate(view, glm::radians(rot), glm::vec3(0, 1, 0));
-		//view = glm::translate(view, glm::vec3(0, 0, 15));
+		view = glm::rotate(view, glm::radians(rot), glm::vec3(0, 1, 0));
+		view = glm::translate(view, glm::vec3(0, 0, 15));
 		//view = glm::translate(view, camPos);
 		glUniformMatrix4fv(viewLocs.at(shaderSelector), 1, GL_FALSE, glm::value_ptr(glm::inverse(view)));
+		
+		if (inverseViewLocs.at(shaderSelector) != -1)
+		{
+			glUniformMatrix4fv(inverseViewLocs.at(shaderSelector), 1, GL_FALSE, glm::value_ptr(view));
+		}
 
 		// Increase the float angle so next frame the triangle rotates further
 		// How fast the object rotates
@@ -752,11 +823,13 @@ int main()
 		glDrawArrays(GL_TRIANGLES, 0, models.at(modelSelector)->getVertCount());
 		
 		//glBindVertexArray(0);
-		glBindVertexArray(vao->getId());
 
 		//*****************************************************
 		//	ORTHOGRAPHIC PATH
 		//*****************************************************
+
+		glBindVertexArray(vao->getId());
+		glUseProgram(shaderProgramUI->getId());
 
 		// Prepare the orthographic projection matrix (reusing the variable)
 		projection = glm::ortho(0.0f, (float)width, 0.0f,
@@ -765,12 +838,12 @@ int main()
 		// Prepare model matrix. The scale is important because now our triangle
 		// would be the size of a single pixel when mapped to an orthographic
 		// projection.
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(100, height - 100, 0));	// Position of the orthographic view
-		model = glm::scale(model, glm::vec3(100, 100, 0));
+		glm::mat4 UIModel(1.0f);
+		UIModel = glm::translate(UIModel, glm::vec3(100, height - 100, 0));	// Position of the orthographic view
+		UIModel = glm::scale(UIModel, glm::vec3(100, 100, 1));
 
 		// Upload the model matrix
-		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(model));
+		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(UIModel));
 
 		// Upload the projection matrix
 		glUniformMatrix4fv(projectionLocUI, 1, GL_FALSE,
