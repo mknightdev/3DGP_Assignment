@@ -22,6 +22,32 @@
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
+bool intersect(glm::vec2 mouse, glm::vec4 rectangle)
+{
+	if (mouse.x < rectangle.x)
+	{
+		return false;
+	}
+	
+	if (mouse.x > rectangle.x + rectangle.z)
+	{
+		return false;
+	}
+
+	if (mouse.y < rectangle.y)
+	{
+		return false;
+	}
+
+	// W is for vec4 height
+	if (mouse.y > rectangle.y + rectangle.w)
+	{
+		return false;
+	}
+	return true;
+}
+
+
 
 int main()
 {
@@ -85,6 +111,99 @@ int main()
 	vao->setBuffer(0, positionsVbo);
 	vao->setBuffer(1, texturesVbo);
 
+	//*****************************************************
+	//	[UI] Arrows - VBO & VAO
+	//*****************************************************
+
+	// LEFT ARROW
+	std::shared_ptr<VertexBuffer> leftArrowPosVBO = std::make_shared<VertexBuffer>();
+
+	// Added to data vector (floats)
+	// Tri 1
+	leftArrowPosVBO->add(glm::vec3(-0.5f, -0.5f, 0.0f));	// Bottom Left
+	leftArrowPosVBO->add(glm::vec3(0.5f, -0.5f, 0.0f));	// Bottom Right
+	leftArrowPosVBO->add(glm::vec3(-0.5f, 0.5f, 0.0f));	// Top Right
+
+	// Tri 2
+	leftArrowPosVBO->add(glm::vec3(0.5f, 0.5f, 0.0f));		// Top Right
+	leftArrowPosVBO->add(glm::vec3(0.5f, -0.5f, 0.0f));	// Bottom Right
+	leftArrowPosVBO->add(glm::vec3(-0.5f, 0.5f, 0.0f));	// Top Left
+
+	std::shared_ptr<VertexBuffer> leftArrowTexturesVBO = std::make_shared<VertexBuffer>();
+
+	leftArrowTexturesVBO->add(glm::vec2(0.0f, 0.0f));
+	leftArrowTexturesVBO->add(glm::vec2(1.0f, 0.0f));
+	leftArrowTexturesVBO->add(glm::vec2(0.0f, -1.0f));
+	leftArrowTexturesVBO->add(glm::vec2(1.0f, -1.0f));
+	leftArrowTexturesVBO->add(glm::vec2(1.0f, 0.0f));
+	leftArrowTexturesVBO->add(glm::vec2(0.0f, -1.0f));
+
+	std::shared_ptr<VertexArray> leftArrowVAO = std::make_shared<VertexArray>();
+	leftArrowVAO->setBuffer(0, leftArrowPosVBO);
+	leftArrowVAO->setBuffer(1, leftArrowTexturesVBO);
+
+	// RIGHT ARROW
+	std::shared_ptr<VertexBuffer> rightArrowPosVBO = std::make_shared<VertexBuffer>();
+
+	// Added to data vector (floats)
+	// Tri 1
+	rightArrowPosVBO->add(glm::vec3(-0.5f, -0.5f, 0.0f));	// Bottom Left
+	rightArrowPosVBO->add(glm::vec3(0.5f, -0.5f, 0.0f));	// Bottom Right
+	rightArrowPosVBO->add(glm::vec3(-0.5f, 0.5f, 0.0f));	// Top Right
+
+	// Tri 2
+	rightArrowPosVBO->add(glm::vec3(0.5f, 0.5f, 0.0f));		// Top Right
+	rightArrowPosVBO->add(glm::vec3(0.5f, -0.5f, 0.0f));	// Bottom Right
+	rightArrowPosVBO->add(glm::vec3(-0.5f, 0.5f, 0.0f));	// Top Left
+
+	std::shared_ptr<VertexBuffer> rightArrowTexturesVBO = std::make_shared<VertexBuffer>();
+
+	rightArrowTexturesVBO->add(glm::vec2(0.0f, 0.0f));
+	rightArrowTexturesVBO->add(glm::vec2(1.0f, 0.0f));
+	rightArrowTexturesVBO->add(glm::vec2(0.0f, -1.0f));
+	rightArrowTexturesVBO->add(glm::vec2(1.0f, -1.0f));
+	rightArrowTexturesVBO->add(glm::vec2(1.0f, 0.0f));
+	rightArrowTexturesVBO->add(glm::vec2(0.0f, -1.0f));
+
+	std::shared_ptr<VertexArray> rightArrowVAO = std::make_shared<VertexArray>();
+	rightArrowVAO->setBuffer(0, rightArrowPosVBO);
+	rightArrowVAO->setBuffer(1, rightArrowTexturesVBO);
+
+	//*****************************************************
+	//	[UI] ICONS - VBO & VAO
+	//*****************************************************
+
+	// MODEL ICON
+	std::shared_ptr<VertexBuffer> modelIconPosVBO = std::make_shared<VertexBuffer>();
+
+	// Added to data vector (floats)
+	// Tri 1
+	modelIconPosVBO->add(glm::vec3(-0.5f, -0.5f, 0.0f));	// Bottom Left
+	modelIconPosVBO->add(glm::vec3(0.5f, -0.5f, 0.0f));	// Bottom Right
+	modelIconPosVBO->add(glm::vec3(-0.5f, 0.5f, 0.0f));	// Top Right
+
+	// Tri 2
+	modelIconPosVBO->add(glm::vec3(0.5f, 0.5f, 0.0f));		// Top Right
+	modelIconPosVBO->add(glm::vec3(0.5f, -0.5f, 0.0f));	// Bottom Right
+	modelIconPosVBO->add(glm::vec3(-0.5f, 0.5f, 0.0f));	// Top Left
+
+	std::shared_ptr<VertexBuffer> modelIconTexturesVBO = std::make_shared<VertexBuffer>();
+
+	modelIconTexturesVBO->add(glm::vec2(0.0f, 0.0f));
+	modelIconTexturesVBO->add(glm::vec2(1.0f, 0.0f));
+	modelIconTexturesVBO->add(glm::vec2(0.0f, -1.0f));
+	modelIconTexturesVBO->add(glm::vec2(1.0f, -1.0f));
+	modelIconTexturesVBO->add(glm::vec2(1.0f, 0.0f));
+	modelIconTexturesVBO->add(glm::vec2(0.0f, -1.0f));
+
+	std::shared_ptr<VertexArray> modelIconVAO = std::make_shared<VertexArray>();
+	modelIconVAO->setBuffer(0, modelIconPosVBO);
+	modelIconVAO->setBuffer(1, modelIconTexturesVBO);
+
+	//*****************************************************
+	//	READ IN FROM FILE
+	//*****************************************************
+
 	// Model destination
 	std::string modelSettings;
 
@@ -146,6 +265,7 @@ int main()
 		"varying vec3 v_Normal;											" \
 		"uniform float u_Pulse;											" \
 		"uniform mat4 u_View;											" \
+		"uniform mat4 u_InverseView;											" \
 		"																" \
 		"void main()													" \
 		"{																" \
@@ -158,14 +278,14 @@ int main()
 		" float diff = max(dot(norm, lightDir), 0.0);					" \
 		" vec3 diffuse = vec3(0, 1, 1) * diff;							" \
 		"																" \
-		" vec3 viewPos = vec3(inverse(u_View) * vec4(0, 0, 0, 1));		" \
+		" vec3 viewPos = vec3(u_InverseView * vec4(0, 0, 0, 1));		" \
 		" vec3 viewDir = normalize(viewPos - v_FragPos);				" \
 		" vec3 reflectDir = reflect(-lightDir, norm);					" \
 		" float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);	" \
 		" vec3 specular = spec * vec3(1, 1, 1); 						" \
 		" 																" \
 		"																" \
-		" gl_FragColor = vec4(diffuse + specular, 1.0);					" \
+		" gl_FragColor = vec4(diffuse + specular, 1.0) * tex;					" \
 		"}																";
 
 	//*****************************************************
@@ -255,7 +375,7 @@ int main()
 		"																" \
 		" 																" \
 		"																" \
-		" gl_FragColor = vec4(diffuse, 1.0);							" \
+		" gl_FragColor = vec4(diffuse, 1.0) * tex;							" \
 		"}																";
 
 	std::shared_ptr<ShaderProgram> shaderProgram2 = std::make_shared<ShaderProgram>();
@@ -357,6 +477,7 @@ int main()
 	GLint modelLoc = glGetUniformLocation(shaderProgram->getId(), "u_Model");
 	GLint projectionLoc = glGetUniformLocation(shaderProgram->getId(), "u_Projection");
 	GLint viewLoc = glGetUniformLocation(shaderProgram->getId(), "u_View");
+	GLint inverseViewLoc = glGetUniformLocation(shaderProgram->getId(), "u_InverseView");
 
 	if (modelLoc == -1)
 	{
@@ -367,6 +488,10 @@ int main()
 		throw std::exception();
 	}
 	if (viewLoc == -1)
+	{
+		throw std::exception();
+	}
+	if (inverseViewLoc == -1)
 	{
 		throw std::exception();
 	}
@@ -450,11 +575,13 @@ int main()
 		throw std::exception();
 	}
 
+
 	// VECTORS
 	std::vector<GLint> pulseLocs;
 	std::vector<GLint> modelLocs;
 	std::vector<GLint> projectionLocs;
 	std::vector<GLint> viewLocs;
+	std::vector<GLint> inverseViewLocs;
 
 	pulseLocs.push_back(pulseLoc);
 	pulseLocs.push_back(pulseLoc2);
@@ -472,9 +599,13 @@ int main()
 	viewLocs.push_back(viewLoc2);
 	viewLocs.push_back(viewLoc3);
 
+	inverseViewLocs.push_back(inverseViewLoc);
+	inverseViewLocs.push_back(-1);
+	inverseViewLocs.push_back(-1);
+
 
 	//*****************************************************
-	//	[IMAGE] LOAD 
+	//	[IMAGE] LOAD  
 	//	- File needs to be placed next to the project file. 
 	//*****************************************************
 
@@ -484,8 +615,9 @@ int main()
 	//unsigned char* data = stbi_load("image.png", &w, &h, NULL, 4);
 	// Cat: 
 	// TODO: SWAP BETWEEN TEXTURES WHEN SWAPPING BETWEEN MODELS
-	unsigned char* data = stbi_load("models/croc/croc_diffuse.png", &w, &h, NULL, 4);
 
+	unsigned char* data = stbi_load("models/curuthers/Whiskers_diffuse.png", &w, &h, NULL, 4);
+	//unsigned char* data = stbi_load("models/arrow.png", &w, &h, NULL, 4);
 	if (!data)
 	{
 		throw std::exception();
@@ -520,6 +652,165 @@ int main()
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	//*****************************************************
+	//	[IMAGE] LEFT ARROW   
+	//*****************************************************
+
+	//unsigned char* data = stbi_load("image.png", &w, &h, NULL, 4);
+	// Cat: 
+	// TODO: SWAP BETWEEN TEXTURES WHEN SWAPPING BETWEEN MODELS
+
+	unsigned char* leftArrow = stbi_load("models/leftarrow.png", &w, &h, NULL, 4);
+	unsigned char* leftArrowActive = stbi_load("models/leftarrowactive.png", &w, &h, NULL, 4);
+
+	if (!leftArrow)
+	{
+		throw std::exception();
+	}
+
+	if (!leftArrowActive)
+	{
+		throw std::exception();
+	}
+
+	//*****************************************************
+	//	[IMAGE] UPLOAD LEFT ARROW TO GPU
+	//*****************************************************
+
+	// Create and bind a texture.
+	GLuint leftArrowTextureId = 0;
+	glGenTextures(1, &leftArrowTextureId);
+
+	if (!leftArrowTextureId)
+	{
+		throw std::exception();
+	}
+
+	glBindTexture(GL_TEXTURE_2D, leftArrowTextureId);
+
+	// Upload the image data to the bound texture unit in the GPU
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
+		GL_UNSIGNED_BYTE, leftArrow);
+
+	// Free the loaded data because we now have a copy on the GPU
+	free(leftArrow);
+
+	// Generate Mipmap so the texture can be mapped correctly
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	// Unbind the texture because we are done operating on it
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	// Create and bind a texture.
+	GLuint leftArrowActiveTextureId = 0;
+	glGenTextures(1, &leftArrowActiveTextureId);
+
+	if (!leftArrowActiveTextureId)
+	{
+		throw std::exception();
+	}
+
+	glBindTexture(GL_TEXTURE_2D, leftArrowActiveTextureId);
+
+	// Upload the image data to the bound texture unit in the GPU
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
+		GL_UNSIGNED_BYTE, leftArrowActive);
+
+	// Free the loaded data because we now have a copy on the GPU
+	free(leftArrowActive);
+
+	// Generate Mipmap so the texture can be mapped correctly
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	// Unbind the texture because we are done operating on it
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	//*****************************************************
+	//	[IMAGE] LEFT ARROW   
+	//*****************************************************
+
+	//unsigned char* data = stbi_load("image.png", &w, &h, NULL, 4);
+	// Cat: 
+	// TODO: SWAP BETWEEN TEXTURES WHEN SWAPPING BETWEEN MODELS
+
+	unsigned char* rightArrow = stbi_load("models/rightarrow.png", &w, &h, NULL, 4);
+
+	if (!rightArrow)
+	{
+		throw std::exception();
+	}
+
+	//*****************************************************
+	//	[IMAGE] UPLOAD LEFT ARROW TO GPU
+	//*****************************************************
+
+	// Create and bind a texture.
+	GLuint rightArrowTextureId = 0;
+	glGenTextures(1, &rightArrowTextureId);
+
+	if (!rightArrowTextureId)
+	{
+		throw std::exception();
+	}
+
+	glBindTexture(GL_TEXTURE_2D, rightArrowTextureId);
+
+	// Upload the image data to the bound texture unit in the GPU
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
+		GL_UNSIGNED_BYTE, rightArrow);
+
+	// Free the loaded data because we now have a copy on the GPU
+	free(rightArrow);
+
+	// Generate Mipmap so the texture can be mapped correctly
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	// Unbind the texture because we are done operating on it
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	//*****************************************************
+	//	[IMAGE] LEFT ARROW   
+	//*****************************************************
+
+	//unsigned char* data = stbi_load("image.png", &w, &h, NULL, 4);
+	// Cat: 
+	// TODO: SWAP BETWEEN TEXTURES WHEN SWAPPING BETWEEN MODELS
+
+	unsigned char* modelIcon = stbi_load("models/modelicon.png", &w, &h, NULL, 4);
+
+	if (!modelIcon)
+	{
+		throw std::exception();
+	}
+
+	//*****************************************************
+	//	[IMAGE] UPLOAD LEFT ARROW TO GPU
+	//*****************************************************
+
+	// Create and bind a texture.
+	GLuint modelIconTextureId = 0;
+	glGenTextures(1, &modelIconTextureId);
+
+	if (!modelIconTextureId)
+	{
+		throw std::exception();
+	}
+
+	glBindTexture(GL_TEXTURE_2D, modelIconTextureId);
+
+	// Upload the image data to the bound texture unit in the GPU
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
+		GL_UNSIGNED_BYTE, modelIcon);
+
+	// Free the loaded data because we now have a copy on the GPU
+	free(modelIcon);
+
+	// Generate Mipmap so the texture can be mapped correctly
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	// Unbind the texture because we are done operating on it
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	//*****************************************************
 	//	MAIN LOOP
 	//*****************************************************
 	bool stopped = false;
@@ -543,6 +834,11 @@ int main()
 
 	glm::vec3 camPos(0, 0, 15);
 
+	glm::vec2 mouse(0, 0);
+	bool mouseButtonDown = false;
+
+	bool leftArrowPressed = false;
+
 	while (!stopped)
 	{
 		int width = 0;
@@ -555,6 +851,9 @@ int main()
 
 		SDL_Event event = { 0 };
 
+		//*****************************************************
+		//	KEYBOARD EVENTS
+		//*****************************************************
 		while (SDL_PollEvent(&event))
 		{
 			if (event.type == SDL_QUIT)
@@ -676,6 +975,19 @@ int main()
 					break;
 				}
 			}
+			else if (event.type == SDL_MOUSEMOTION)
+			{
+				mouse = glm::vec2(event.motion.x, event.motion.y);
+				
+			}
+			else if (event.type == SDL_MOUSEBUTTONDOWN)
+			{
+				mouseButtonDown = true;
+			}
+			else if (event.type == SDL_MOUSEBUTTONUP)
+			{
+				mouseButtonDown = false;
+			}
 		}
 
 		float currTime = SDL_GetTicks();
@@ -690,6 +1002,57 @@ int main()
 			pulse = 0;
 		}
 
+		// Update
+		if (intersect(mouse, glm::vec4(50, 50, 100, 100)) && mouseButtonDown)
+		{
+			std::cout << "Texture intersect True" << std::endl; 
+			mouseButtonDown = false;
+		}
+
+		// Left Arrow
+		if (intersect(mouse, glm::vec4(50, 450, 100, 100)) && mouseButtonDown)
+		{
+
+			if (modelSelector == 0)
+			{
+				/* if selector equals zero, set selector to be the value of the end of the model vector,
+				* this prevents us from going out of bounds. */
+				modelSelector = models.size() - 1;
+				std::cout << "Model Selector: " << modelSelector << std::endl;
+			}
+			else
+			{
+				// Otherwise, continue decreasing selector to view previous models.
+				modelSelector--;
+				std::cout << "Model Selector: " << modelSelector << std::endl;
+			}
+
+			std::cout << "Left arrow intersect True" << std::endl;
+			mouseButtonDown = false;	// Prevents holding down mouse button 
+		}
+
+		// Right Arrow
+		if (intersect(mouse, glm::vec4(width - 150, 450, 100, 100)) && mouseButtonDown)
+		{
+			if (modelSelector == models.size() - 1)
+			{
+				/* If selector is the same as our vector of models (-1),
+				* set selector back to zero so we don't go out of bounds.*/
+				modelSelector = 0;
+				std::cout << "Model Selector: " << modelSelector << std::endl;
+			}
+			else
+			{
+				// Otherwise, continue increasing selector to view further models. 
+				modelSelector++;
+				std::cout << "Model Selector: " << modelSelector << std::endl;
+			}
+
+			std::cout << "Right arrow intersect True" << std::endl;
+			mouseButtonDown = false;	// Prevents holding down mouse button 
+		}
+
+
 		// Set background to Cyan 
 		glClearColor(0.0f, 0.33f, 0.5f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -701,7 +1064,8 @@ int main()
 		// Cat:
 		glBindVertexArray(models.at(modelSelector)->getId());
 		glBindTexture(GL_TEXTURE_2D, textureId);
-
+		//glBindTexture(GL_TEXTURE_2D, textures->getId());
+	
 		//glUniform1f(pulseLocs.at(shaderSelector), pulse);
 
 		//*****************************************************
@@ -719,7 +1083,7 @@ int main()
 		// Prepare the model matrix
 		glm::mat4 model(1.0f);
 		//model = glm::rotate(model, glm::radians(rot), glm::vec3(0, 1, 0));
-		model = glm::translate(model, glm::vec3(0, 0, -15));
+		model = glm::translate(model, glm::vec3(0, 0, 0));
 		model = glm::scale(model, glm::vec3(scale, scale, scale));
 
 		//glm::vec3 diff = glm::vec3(model * glm::vec4(0, 0, 0, 1));
@@ -732,10 +1096,15 @@ int main()
 
 		// If we do rotate then translate, it will look like it will orbit around the model
 		glm::mat4 view(1.0f);
-		//view = glm::rotate(view, glm::radians(rot), glm::vec3(0, 1, 0));
-		//view = glm::translate(view, glm::vec3(0, 0, 15));
+		view = glm::rotate(view, glm::radians(rot), glm::vec3(0, 1, 0));
+		view = glm::translate(view, glm::vec3(0, 0, 15));
 		//view = glm::translate(view, camPos);
 		glUniformMatrix4fv(viewLocs.at(shaderSelector), 1, GL_FALSE, glm::value_ptr(glm::inverse(view)));
+		
+		if (inverseViewLocs.at(shaderSelector) != -1)
+		{
+			glUniformMatrix4fv(inverseViewLocs.at(shaderSelector), 1, GL_FALSE, glm::value_ptr(view));
+		}
 
 		// Increase the float angle so next frame the triangle rotates further
 		// How fast the object rotates
@@ -751,12 +1120,14 @@ int main()
 		// Cat:
 		glDrawArrays(GL_TRIANGLES, 0, models.at(modelSelector)->getVertCount());
 		
-		//glBindVertexArray(0);
-		glBindVertexArray(vao->getId());
+		glDisable(GL_DEPTH_TEST);
 
 		//*****************************************************
 		//	ORTHOGRAPHIC PATH
 		//*****************************************************
+
+		glBindVertexArray(vao->getId());
+		glUseProgram(shaderProgramUI->getId());
 
 		// Prepare the orthographic projection matrix (reusing the variable)
 		projection = glm::ortho(0.0f, (float)width, 0.0f,
@@ -765,12 +1136,12 @@ int main()
 		// Prepare model matrix. The scale is important because now our triangle
 		// would be the size of a single pixel when mapped to an orthographic
 		// projection.
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(100, height - 100, 0));	// Position of the orthographic view
-		model = glm::scale(model, glm::vec3(100, 100, 0));
+		glm::mat4 UIModel(1.0f);
+		UIModel = glm::translate(UIModel, glm::vec3(100, height - 100, 0));	// Position of the orthographic view
+		UIModel = glm::scale(UIModel, glm::vec3(100, 100, 1));
 
 		// Upload the model matrix
-		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(model));
+		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(UIModel));
 
 		// Upload the projection matrix
 		glUniformMatrix4fv(projectionLocUI, 1, GL_FALSE,
@@ -780,7 +1151,97 @@ int main()
 		// Draw 3 vertices (a triangle)
 		glDrawArrays(GL_TRIANGLES, 0, vao->getVertCount());
 
-		glDisable(GL_DEPTH_TEST);
+		//*****************************************************
+		// [HUD] Left Arrow
+		//*****************************************************
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glBindTexture(GL_TEXTURE_2D, leftArrowTextureId);
+		glBindVertexArray(leftArrowVAO->getId());
+
+		glm::mat4 leftArrowModel(1.0f);
+		leftArrowModel = glm::translate(leftArrowModel, glm::vec3(100, height - 500, 0));
+		leftArrowModel = glm::scale(leftArrowModel, glm::vec3(100, 100, 1));
+
+		// Upload the model matrix
+		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(leftArrowModel));
+
+		// Upload the projection matrix
+		glUniformMatrix4fv(projectionLocUI, 1, GL_FALSE,
+			glm::value_ptr(projection));
+
+		glDrawArrays(GL_TRIANGLES, 0, leftArrowVAO->getVertCount());
+
+		//*****************************************************
+		// [HUD] Right Arrow
+		//*****************************************************
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glBindTexture(GL_TEXTURE_2D, rightArrowTextureId);
+		glBindVertexArray(rightArrowVAO->getId());
+
+		glm::mat4 rightArrowModel(1.0f);
+		rightArrowModel = glm::translate(rightArrowModel, glm::vec3(width - 100, height - 500, 0));
+		rightArrowModel = glm::scale(rightArrowModel, glm::vec3(100, 100, 1));
+
+		// Upload the model matrix
+		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(rightArrowModel));
+
+		// Upload the projection matrix
+		glUniformMatrix4fv(projectionLocUI, 1, GL_FALSE,
+			glm::value_ptr(projection));
+
+		glDrawArrays(GL_TRIANGLES, 0, rightArrowVAO->getVertCount());
+
+		//*****************************************************
+		// [HUD] Model Icon (right)
+		//*****************************************************
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glBindTexture(GL_TEXTURE_2D, modelIconTextureId);
+		glBindVertexArray(modelIconVAO->getId());
+
+		glm::mat4 modelIconModel(1.0f);
+		modelIconModel = glm::translate(modelIconModel, glm::vec3(width - 125, height - 450, 0));
+		modelIconModel = glm::scale(modelIconModel, glm::vec3(50, 50, 1));
+
+		// Upload the model matrix
+		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(modelIconModel));
+
+		// Upload the projection matrix
+		glUniformMatrix4fv(projectionLocUI, 1, GL_FALSE,
+			glm::value_ptr(projection));
+
+		glDrawArrays(GL_TRIANGLES, 0, modelIconVAO->getVertCount());
+
+		//*****************************************************
+		// [HUD] Model Icon (left)
+		//*****************************************************
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glBindTexture(GL_TEXTURE_2D, modelIconTextureId);
+		glBindVertexArray(modelIconVAO->getId());
+
+		glm::mat4 modelIconModelLeft(1.0f);
+		modelIconModelLeft = glm::translate(modelIconModelLeft, glm::vec3(125, height - 450, 0));
+		modelIconModelLeft = glm::scale(modelIconModelLeft, glm::vec3(50, 50, 1));
+
+		// Upload the model matrix
+		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(modelIconModelLeft));
+
+		// Upload the projection matrix
+		glUniformMatrix4fv(projectionLocUI, 1, GL_FALSE,
+			glm::value_ptr(projection));
+
+		glDrawArrays(GL_TRIANGLES, 0, modelIconVAO->getVertCount());
 
 		//*****************************************************
 		//	RESET THE STATE
