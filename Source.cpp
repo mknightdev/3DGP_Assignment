@@ -3,6 +3,7 @@
 #include "VertexBuffer.h"
 #include "VertexArray.h"
 #include "ShaderProgram.h"
+#include "Texture.h"
 
 /* Lab 4 - Start*/
 // Needs to be defined before the include in exactly
@@ -28,7 +29,7 @@ bool intersect(glm::vec2 mouse, glm::vec4 rectangle)
 	{
 		return false;
 	}
-	
+
 	if (mouse.x > rectangle.x + rectangle.z)
 	{
 		return false;
@@ -222,7 +223,7 @@ int main()
 	//std::shared_ptr<VertexArray> cat = std::make_shared<VertexArray>(modelSettings);
 	std::shared_ptr<VertexArray> cat = std::make_shared<VertexArray>("models/curuthers/curuthers.obj");
 	std::shared_ptr<VertexArray> skeleton = std::make_shared<VertexArray>("models/skeleton/skeleton.obj");
-	std::shared_ptr<VertexArray> croc = std::make_shared<VertexArray>("models/croc/croc.obj");	
+	std::shared_ptr<VertexArray> croc = std::make_shared<VertexArray>("models/croc/croc.obj");
 
 	std::vector<std::shared_ptr<VertexArray>> models;
 
@@ -604,7 +605,6 @@ int main()
 	inverseViewLocs.push_back(-1);
 	inverseViewLocs.push_back(-1);
 
-
 	//*****************************************************
 	//	[IMAGE] LOAD  
 	//	- File needs to be placed next to the project file. 
@@ -613,348 +613,40 @@ int main()
 	int w = 0;
 	int h = 0;
 
-	//unsigned char* data = stbi_load("image.png", &w, &h, NULL, 4);
-	// Cat: 
-	// TODO: SWAP BETWEEN TEXTURES WHEN SWAPPING BETWEEN MODELS
-
-	unsigned char* data = stbi_load("models/curuthers/Whiskers_diffuse.png", &w, &h, NULL, 4);
-
-	if (!data)
-	{
-		throw std::exception();
-	}
-
-	//*****************************************************
-	//	[IMAGE] UPLOAD TO GPU
-	//*****************************************************
-
-	// Create and bind a texture.
-	GLuint textureId = 0;
-	glGenTextures(1, &textureId);
-
-	if (!textureId)
-	{
-		throw std::exception();
-	}
-
-	glBindTexture(GL_TEXTURE_2D, textureId);
-
-	// Upload the image data to the bound texture unit in the GPU
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
-		GL_UNSIGNED_BYTE, data);
-
-	// Free the loaded data because we now have a copy on the GPU
-	free(data);
-
-	// Generate Mipmap so the texture can be mapped correctly
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	// Unbind the texture because we are done operating on it
-	glBindTexture(GL_TEXTURE_2D, 0);
+	std::shared_ptr<Texture> data = std::make_shared<Texture>(stbi_load("models/curuthers/Whiskers_diffuse.png", &w, &h, NULL, 4), w, h);
 
 	//*****************************************************
 	//	[IMAGE] LEFT ARROW   
 	//*****************************************************
 
-	//unsigned char* data = stbi_load("image.png", &w, &h, NULL, 4);
-	// Cat: 
-	// TODO: SWAP BETWEEN TEXTURES WHEN SWAPPING BETWEEN MODELS
-
-	unsigned char* leftArrow = stbi_load("models/leftarrow.png", &w, &h, NULL, 4);
-	unsigned char* leftArrowActive = stbi_load("models/leftarrowactive.png", &w, &h, NULL, 4);
-
-	if (!leftArrow)
-	{
-		throw std::exception();
-	}
-
-	if (!leftArrowActive)
-	{
-		throw std::exception();
-	}
-
-	//*****************************************************
-	//	[IMAGE] UPLOAD LEFT ARROW TO GPU
-	//*****************************************************
-
-	// Create and bind a texture.
-	GLuint leftArrowTextureId = 0;
-	glGenTextures(1, &leftArrowTextureId);
-
-	if (!leftArrowTextureId)
-	{
-		throw std::exception();
-	}
-
-	glBindTexture(GL_TEXTURE_2D, leftArrowTextureId);
-
-	// Upload the image data to the bound texture unit in the GPU
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
-		GL_UNSIGNED_BYTE, leftArrow);
-
-	// Free the loaded data because we now have a copy on the GPU
-	free(leftArrow);
-
-	// Generate Mipmap so the texture can be mapped correctly
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	// Unbind the texture because we are done operating on it
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	// Create and bind a texture.
-	GLuint leftArrowActiveTextureId = 0;
-	glGenTextures(1, &leftArrowActiveTextureId);
-
-	if (!leftArrowActiveTextureId)
-	{
-		throw std::exception();
-	}
-
-	glBindTexture(GL_TEXTURE_2D, leftArrowActiveTextureId);
-
-	// Upload the image data to the bound texture unit in the GPU
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
-		GL_UNSIGNED_BYTE, leftArrowActive);
-
-	// Free the loaded data because we now have a copy on the GPU
-	free(leftArrowActive);
-
-	// Generate Mipmap so the texture can be mapped correctly
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	// Unbind the texture because we are done operating on it
-	glBindTexture(GL_TEXTURE_2D, 0);
+	std::shared_ptr<Texture> leftArrow = std::make_shared<Texture>(stbi_load("models/leftarrow.png", &w, &h, NULL, 4), w, h);
+	std::shared_ptr<Texture> leftArrowActive = std::make_shared<Texture>(stbi_load("models/leftarrowactive.png", &w, &h, NULL, 4), w, h);
 
 	//*****************************************************
 	//	[IMAGE] RIGHT ARROW   
 	//*****************************************************
 
-	//unsigned char* data = stbi_load("image.png", &w, &h, NULL, 4);
-	// Cat: 
-	// TODO: SWAP BETWEEN TEXTURES WHEN SWAPPING BETWEEN MODELS
-
-	unsigned char* rightArrow = stbi_load("models/rightarrow.png", &w, &h, NULL, 4);
-	unsigned char* rightArrowActive = stbi_load("models/rightarrowactive.png", &w, &h, NULL, 4);
-
-	if (!rightArrow)
-	{
-		throw std::exception();
-	}
-
-	if (!rightArrowActive)
-	{
-		throw std::exception();
-	}
-
-	//*****************************************************
-	//	[IMAGE] UPLOAD RIGHT ARROW TO GPU
-	//*****************************************************
-
-	// Create and bind a texture.
-	GLuint rightArrowTextureId = 0;
-	glGenTextures(1, &rightArrowTextureId);
-
-	if (!rightArrowTextureId)
-	{
-		throw std::exception();
-	}
-
-	glBindTexture(GL_TEXTURE_2D, rightArrowTextureId);
-
-	// Upload the image data to the bound texture unit in the GPU
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
-		GL_UNSIGNED_BYTE, rightArrow);
-
-	// Free the loaded data because we now have a copy on the GPU
-	free(rightArrow);
-
-	// Generate Mipmap so the texture can be mapped correctly
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	// Unbind the texture because we are done operating on it
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	// Create and bind a texture.
-	GLuint rightArrowActiveTextureId = 0;
-	glGenTextures(1, &rightArrowActiveTextureId);
-
-	if (!rightArrowActiveTextureId)
-	{
-		throw std::exception();
-	}
-
-	glBindTexture(GL_TEXTURE_2D, rightArrowActiveTextureId);
-
-	// Upload the image data to the bound texture unit in the GPU
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
-		GL_UNSIGNED_BYTE, rightArrowActive);
-
-	// Free the loaded data because we now have a copy on the GPU
-	free(rightArrowActive);
-
-	// Generate Mipmap so the texture can be mapped correctly
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	// Unbind the texture because we are done operating on it
-	glBindTexture(GL_TEXTURE_2D, 0);
+	std::shared_ptr<Texture> rightArrow = std::make_shared<Texture>(stbi_load("models/rightarrow.png", &w, &h, NULL, 4), w, h);
+	std::shared_ptr<Texture> rightArrowActive = std::make_shared<Texture>(stbi_load("models/rightarroveactive.png", &w, &h, NULL, 4), w, h);
 
 	//*****************************************************
 	//	[IMAGE] MODEL ICON
 	//*****************************************************
 
-	//unsigned char* data = stbi_load("image.png", &w, &h, NULL, 4);
-	// Cat: 
-	// TODO: SWAP BETWEEN TEXTURES WHEN SWAPPING BETWEEN MODELS
-
-	unsigned char* modelIcon = stbi_load("models/modelicon.png", &w, &h, NULL, 4);
-
-	if (!modelIcon)
-	{
-		throw std::exception();
-	}
-
-	//*****************************************************
-	//	[IMAGE] UPLOAD MODEL ICON TO GPU
-	//*****************************************************
-
-	// Create and bind a texture.
-	GLuint modelIconTextureId = 0;
-	glGenTextures(1, &modelIconTextureId);
-
-	if (!modelIconTextureId)
-	{
-		throw std::exception();
-	}
-
-	glBindTexture(GL_TEXTURE_2D, modelIconTextureId);
-
-	// Upload the image data to the bound texture unit in the GPU
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
-		GL_UNSIGNED_BYTE, modelIcon);
-
-	// Free the loaded data because we now have a copy on the GPU
-	free(modelIcon);
-
-	// Generate Mipmap so the texture can be mapped correctly
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	// Unbind the texture because we are done operating on it
-	glBindTexture(GL_TEXTURE_2D, 0);
+	std::shared_ptr<Texture> modelIcon = std::make_shared<Texture>(stbi_load("models/modelicon.png", &w, &h, NULL, 4), w, h);
 
 	//*****************************************************
 	//	[IMAGE] SHADER ICON
 	//*****************************************************
 
-	//unsigned char* data = stbi_load("image.png", &w, &h, NULL, 4);
-	// Cat: 
-	// TODO: SWAP BETWEEN TEXTURES WHEN SWAPPING BETWEEN MODELS
-
-	unsigned char* shaderIcon = stbi_load("models/shadericon.png", &w, &h, NULL, 4);
-
-	if (!shaderIcon)
-	{
-		throw std::exception();
-	}
-
-	//*****************************************************
-	//	[IMAGE] UPLOAD SHADER ICON TO GPU
-	//*****************************************************
-
-	// Create and bind a texture.
-	GLuint shaderIconTextureId = 0;
-	glGenTextures(1, &shaderIconTextureId);
-
-	if (!shaderIconTextureId)
-	{
-		throw std::exception();
-	}
-
-	glBindTexture(GL_TEXTURE_2D, shaderIconTextureId);
-
-	// Upload the image data to the bound texture unit in the GPU
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
-		GL_UNSIGNED_BYTE, shaderIcon);
-
-	// Free the loaded data because we now have a copy on the GPU
-	free(shaderIcon);
-
-	// Generate Mipmap so the texture can be mapped correctly
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	// Unbind the texture because we are done operating on it
-	glBindTexture(GL_TEXTURE_2D, 0);
+	std::shared_ptr<Texture> shaderIcon = std::make_shared<Texture>(stbi_load("models/shadericon.png", &w, &h, NULL, 4), w, h);
 
 	//*****************************************************
 	//	[IMAGE] ROTATE ICON
 	//*****************************************************
 
-	//unsigned char* data = stbi_load("image.png", &w, &h, NULL, 4);
-	// Cat: 
-	// TODO: SWAP BETWEEN TEXTURES WHEN SWAPPING BETWEEN MODELS
-
-	unsigned char* rotateIcon = stbi_load("models/rotate.png", &w, &h, NULL, 4);
-	unsigned char* rotateActiveIcon = stbi_load("models/rotateactive.png", &w, &h, NULL, 4);
-
-	if (!rotateIcon)
-	{
-		throw std::exception();
-	}
-	if (!rotateActiveIcon)
-	{
-		throw std::exception();
-	}
-
-	//*****************************************************
-	//	[IMAGE] UPLOAD ROTATE ICON TO GPU
-	//*****************************************************
-
-	// Create and bind a texture.
-	GLuint rotateIconTextureId = 0;
-	glGenTextures(1, &rotateIconTextureId);
-
-	if (!rotateIconTextureId)
-	{
-		throw std::exception();
-	}
-
-	glBindTexture(GL_TEXTURE_2D, rotateIconTextureId);
-
-	// Upload the image data to the bound texture unit in the GPU
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
-		GL_UNSIGNED_BYTE, rotateIcon);
-
-	// Free the loaded data because we now have a copy on the GPU
-	free(rotateIcon);
-
-	// Generate Mipmap so the texture can be mapped correctly
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	// Unbind the texture because we are done operating on it
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	// Create and bind a texture.
-	GLuint rotateIconActiveTextureId = 0;
-	glGenTextures(1, &rotateIconActiveTextureId);
-
-	if (!rotateIconActiveTextureId)
-	{
-		throw std::exception();
-	}
-
-	glBindTexture(GL_TEXTURE_2D, rotateIconActiveTextureId);
-
-	// Upload the image data to the bound texture unit in the GPU
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
-		GL_UNSIGNED_BYTE, rotateActiveIcon);
-
-	// Free the loaded data because we now have a copy on the GPU
-	free(rotateActiveIcon);
-
-	// Generate Mipmap so the texture can be mapped correctly
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	// Unbind the texture because we are done operating on it
-	glBindTexture(GL_TEXTURE_2D, 0);
+	std::shared_ptr<Texture> rotateIcon = std::make_shared<Texture>(stbi_load("models/rotate.png", &w, &h, NULL, 4), w, h);
+	std::shared_ptr<Texture> rotateActiveIcon = std::make_shared<Texture>(stbi_load("models/rotateactive.png", &w, &h, NULL, 4), w, h);
 
 	//*****************************************************
 	//	MAIN LOOP
@@ -1123,7 +815,7 @@ int main()
 			else if (event.type == SDL_MOUSEMOTION)
 			{
 				mouse = glm::vec2(event.motion.x, event.motion.y);
-				
+
 			}
 			else if (event.type == SDL_MOUSEBUTTONDOWN)
 			{
@@ -1150,7 +842,7 @@ int main()
 		// Update
 		if (intersect(mouse, glm::vec4(50, 50, 100, 100)) && mouseButtonDown)
 		{
-			std::cout << "Texture intersect True" << std::endl; 
+			std::cout << "Texture intersect True" << std::endl;
 			mouseButtonDown = false;
 		}
 
@@ -1265,9 +957,11 @@ int main()
 		//glBindVertexArray(vao->getId());
 		// Cat:
 		glBindVertexArray(models.at(modelSelector)->getId());
-		glBindTexture(GL_TEXTURE_2D, textureId);
+		glBindTexture(GL_TEXTURE_2D, data->GetId());
+		//glBindTexture(GL_TEXTURE_2D, testTexture.GetId());
+		//glBindTexture(GL_TEXTURE_2D, testTexture2->GetId());
 		//glBindTexture(GL_TEXTURE_2D, textures->getId());
-	
+
 		//glUniform1f(pulseLocs.at(shaderSelector), pulse);
 
 		//*****************************************************
@@ -1278,7 +972,6 @@ int main()
 		// Prepare the perspective projection matrix
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f),
 			(float)width / (float)height, 0.1f, 100.0f);
-
 
 		//	MODEL MATRIX  //
 
@@ -1310,7 +1003,7 @@ int main()
 		view = glm::translate(view, glm::vec3(0, 0, 15));
 		//view = glm::translate(view, camPos);
 		glUniformMatrix4fv(viewLocs.at(shaderSelector), 1, GL_FALSE, glm::value_ptr(glm::inverse(view)));
-		
+
 		if (inverseViewLocs.at(shaderSelector) != -1)
 		{
 			glUniformMatrix4fv(inverseViewLocs.at(shaderSelector), 1, GL_FALSE, glm::value_ptr(view));
@@ -1329,7 +1022,7 @@ int main()
 		//glDrawArrays(GL_TRIANGLES, 0, 6);
 		// Cat:
 		glDrawArrays(GL_TRIANGLES, 0, models.at(modelSelector)->getVertCount());
-		
+
 		glDisable(GL_DEPTH_TEST);
 
 		//*****************************************************
@@ -1368,7 +1061,7 @@ int main()
 		// [HUD] Left Arrow
 		//*****************************************************
 
-		glBindTexture(GL_TEXTURE_2D, leftArrowTextureId);
+		glBindTexture(GL_TEXTURE_2D, leftArrow->GetId());
 		glBindVertexArray(leftArrowVAO->getId());
 
 		glm::mat4 leftArrowModel(1.0f);
@@ -1388,7 +1081,7 @@ int main()
 		// [HUD] Right Arrow
 		//*****************************************************
 
-		glBindTexture(GL_TEXTURE_2D, rightArrowTextureId);
+		glBindTexture(GL_TEXTURE_2D, rightArrow->GetId());
 		glBindVertexArray(rightArrowVAO->getId());
 
 		glm::mat4 rightArrowModel(1.0f);
@@ -1408,7 +1101,7 @@ int main()
 		// [HUD] Model Icon (right)
 		//*****************************************************
 
-		glBindTexture(GL_TEXTURE_2D, modelIconTextureId);
+		glBindTexture(GL_TEXTURE_2D, modelIcon->GetId());
 		glBindVertexArray(modelIconVAO->getId());
 
 		glm::mat4 modelIconModel(1.0f);
@@ -1428,7 +1121,7 @@ int main()
 		// [HUD] Model Icon (left)
 		//*****************************************************
 
-		glBindTexture(GL_TEXTURE_2D, modelIconTextureId);
+		glBindTexture(GL_TEXTURE_2D, modelIcon->GetId());
 		glBindVertexArray(modelIconVAO->getId());
 
 		glm::mat4 modelIconModelLeft(1.0f);
@@ -1448,7 +1141,7 @@ int main()
 		// [HUD] Left Arrow (Shader)
 		//*****************************************************
 
-		glBindTexture(GL_TEXTURE_2D, leftArrowTextureId);
+		glBindTexture(GL_TEXTURE_2D, leftArrow->GetId());
 		glBindVertexArray(leftArrowVAO->getId());
 
 		leftArrowModel = glm::mat4(1.0f);
@@ -1468,7 +1161,7 @@ int main()
 		// [HUD] Right Arrow (Shader)
 		//*****************************************************
 
-		glBindTexture(GL_TEXTURE_2D, rightArrowTextureId);
+		glBindTexture(GL_TEXTURE_2D, rightArrow->GetId());
 		glBindVertexArray(rightArrowVAO->getId());
 
 		rightArrowModel = glm::mat4(1.0f);
@@ -1488,7 +1181,7 @@ int main()
 		// [HUD] Shader Icon (Left)
 		//*****************************************************
 
-		glBindTexture(GL_TEXTURE_2D, shaderIconTextureId);
+		glBindTexture(GL_TEXTURE_2D, shaderIcon->GetId());
 		glBindVertexArray(vao->getId());
 
 		glm::mat4 shaderIconModel(1.0f);
@@ -1508,7 +1201,7 @@ int main()
 		// [HUD] Shader Icon (Right)
 		//*****************************************************
 
-		glBindTexture(GL_TEXTURE_2D, shaderIconTextureId);
+		glBindTexture(GL_TEXTURE_2D, shaderIcon->GetId());
 		glBindVertexArray(vao->getId());
 
 		shaderIconModel = glm::mat4(1.0f);
@@ -1530,11 +1223,11 @@ int main()
 
 		if (rotateOn)
 		{
-			glBindTexture(GL_TEXTURE_2D, rotateIconActiveTextureId);
+			glBindTexture(GL_TEXTURE_2D, rotateActiveIcon->GetId());
 		}
 		else if (!rotateOn)
 		{
-			glBindTexture(GL_TEXTURE_2D, rotateIconTextureId);
+			glBindTexture(GL_TEXTURE_2D, rotateIcon->GetId());
 		}
 		glBindVertexArray(vao->getId());
 
