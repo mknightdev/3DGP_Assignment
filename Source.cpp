@@ -219,9 +219,10 @@ int main()
 	readFile.close();
 
 	// path is the file location
-	std::shared_ptr<VertexArray> cat = std::make_shared<VertexArray>(modelSettings);
+	//std::shared_ptr<VertexArray> cat = std::make_shared<VertexArray>(modelSettings);
+	std::shared_ptr<VertexArray> cat = std::make_shared<VertexArray>("models/curuthers/curuthers.obj");
 	std::shared_ptr<VertexArray> skeleton = std::make_shared<VertexArray>("models/skeleton/skeleton.obj");
-	std::shared_ptr<VertexArray> croc = std::make_shared<VertexArray>("models/croc/croc.obj");
+	std::shared_ptr<VertexArray> croc = std::make_shared<VertexArray>("models/croc/croc.obj");	
 
 	std::vector<std::shared_ptr<VertexArray>> models;
 
@@ -265,7 +266,7 @@ int main()
 		"varying vec3 v_Normal;											" \
 		"uniform float u_Pulse;											" \
 		"uniform mat4 u_View;											" \
-		"uniform mat4 u_InverseView;											" \
+		"uniform mat4 u_InverseView;									" \
 		"																" \
 		"void main()													" \
 		"{																" \
@@ -617,7 +618,7 @@ int main()
 	// TODO: SWAP BETWEEN TEXTURES WHEN SWAPPING BETWEEN MODELS
 
 	unsigned char* data = stbi_load("models/curuthers/Whiskers_diffuse.png", &w, &h, NULL, 4);
-	//unsigned char* data = stbi_load("models/arrow.png", &w, &h, NULL, 4);
+
 	if (!data)
 	{
 		throw std::exception();
@@ -725,7 +726,7 @@ int main()
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	//*****************************************************
-	//	[IMAGE] LEFT ARROW   
+	//	[IMAGE] RIGHT ARROW   
 	//*****************************************************
 
 	//unsigned char* data = stbi_load("image.png", &w, &h, NULL, 4);
@@ -733,14 +734,20 @@ int main()
 	// TODO: SWAP BETWEEN TEXTURES WHEN SWAPPING BETWEEN MODELS
 
 	unsigned char* rightArrow = stbi_load("models/rightarrow.png", &w, &h, NULL, 4);
+	unsigned char* rightArrowActive = stbi_load("models/rightarrowactive.png", &w, &h, NULL, 4);
 
 	if (!rightArrow)
 	{
 		throw std::exception();
 	}
 
+	if (!rightArrowActive)
+	{
+		throw std::exception();
+	}
+
 	//*****************************************************
-	//	[IMAGE] UPLOAD LEFT ARROW TO GPU
+	//	[IMAGE] UPLOAD RIGHT ARROW TO GPU
 	//*****************************************************
 
 	// Create and bind a texture.
@@ -767,8 +774,32 @@ int main()
 	// Unbind the texture because we are done operating on it
 	glBindTexture(GL_TEXTURE_2D, 0);
 
+	// Create and bind a texture.
+	GLuint rightArrowActiveTextureId = 0;
+	glGenTextures(1, &rightArrowActiveTextureId);
+
+	if (!rightArrowActiveTextureId)
+	{
+		throw std::exception();
+	}
+
+	glBindTexture(GL_TEXTURE_2D, rightArrowActiveTextureId);
+
+	// Upload the image data to the bound texture unit in the GPU
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
+		GL_UNSIGNED_BYTE, rightArrowActive);
+
+	// Free the loaded data because we now have a copy on the GPU
+	free(rightArrowActive);
+
+	// Generate Mipmap so the texture can be mapped correctly
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	// Unbind the texture because we are done operating on it
+	glBindTexture(GL_TEXTURE_2D, 0);
+
 	//*****************************************************
-	//	[IMAGE] LEFT ARROW   
+	//	[IMAGE] MODEL ICON
 	//*****************************************************
 
 	//unsigned char* data = stbi_load("image.png", &w, &h, NULL, 4);
@@ -783,7 +814,7 @@ int main()
 	}
 
 	//*****************************************************
-	//	[IMAGE] UPLOAD LEFT ARROW TO GPU
+	//	[IMAGE] UPLOAD MODEL ICON TO GPU
 	//*****************************************************
 
 	// Create and bind a texture.
@@ -803,6 +834,121 @@ int main()
 
 	// Free the loaded data because we now have a copy on the GPU
 	free(modelIcon);
+
+	// Generate Mipmap so the texture can be mapped correctly
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	// Unbind the texture because we are done operating on it
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	//*****************************************************
+	//	[IMAGE] SHADER ICON
+	//*****************************************************
+
+	//unsigned char* data = stbi_load("image.png", &w, &h, NULL, 4);
+	// Cat: 
+	// TODO: SWAP BETWEEN TEXTURES WHEN SWAPPING BETWEEN MODELS
+
+	unsigned char* shaderIcon = stbi_load("models/shadericon.png", &w, &h, NULL, 4);
+
+	if (!shaderIcon)
+	{
+		throw std::exception();
+	}
+
+	//*****************************************************
+	//	[IMAGE] UPLOAD SHADER ICON TO GPU
+	//*****************************************************
+
+	// Create and bind a texture.
+	GLuint shaderIconTextureId = 0;
+	glGenTextures(1, &shaderIconTextureId);
+
+	if (!shaderIconTextureId)
+	{
+		throw std::exception();
+	}
+
+	glBindTexture(GL_TEXTURE_2D, shaderIconTextureId);
+
+	// Upload the image data to the bound texture unit in the GPU
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
+		GL_UNSIGNED_BYTE, shaderIcon);
+
+	// Free the loaded data because we now have a copy on the GPU
+	free(shaderIcon);
+
+	// Generate Mipmap so the texture can be mapped correctly
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	// Unbind the texture because we are done operating on it
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	//*****************************************************
+	//	[IMAGE] ROTATE ICON
+	//*****************************************************
+
+	//unsigned char* data = stbi_load("image.png", &w, &h, NULL, 4);
+	// Cat: 
+	// TODO: SWAP BETWEEN TEXTURES WHEN SWAPPING BETWEEN MODELS
+
+	unsigned char* rotateIcon = stbi_load("models/rotate.png", &w, &h, NULL, 4);
+	unsigned char* rotateActiveIcon = stbi_load("models/rotateactive.png", &w, &h, NULL, 4);
+
+	if (!rotateIcon)
+	{
+		throw std::exception();
+	}
+	if (!rotateActiveIcon)
+	{
+		throw std::exception();
+	}
+
+	//*****************************************************
+	//	[IMAGE] UPLOAD ROTATE ICON TO GPU
+	//*****************************************************
+
+	// Create and bind a texture.
+	GLuint rotateIconTextureId = 0;
+	glGenTextures(1, &rotateIconTextureId);
+
+	if (!rotateIconTextureId)
+	{
+		throw std::exception();
+	}
+
+	glBindTexture(GL_TEXTURE_2D, rotateIconTextureId);
+
+	// Upload the image data to the bound texture unit in the GPU
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
+		GL_UNSIGNED_BYTE, rotateIcon);
+
+	// Free the loaded data because we now have a copy on the GPU
+	free(rotateIcon);
+
+	// Generate Mipmap so the texture can be mapped correctly
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	// Unbind the texture because we are done operating on it
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	// Create and bind a texture.
+	GLuint rotateIconActiveTextureId = 0;
+	glGenTextures(1, &rotateIconActiveTextureId);
+
+	if (!rotateIconActiveTextureId)
+	{
+		throw std::exception();
+	}
+
+	glBindTexture(GL_TEXTURE_2D, rotateIconActiveTextureId);
+
+	// Upload the image data to the bound texture unit in the GPU
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
+		GL_UNSIGNED_BYTE, rotateActiveIcon);
+
+	// Free the loaded data because we now have a copy on the GPU
+	free(rotateActiveIcon);
 
 	// Generate Mipmap so the texture can be mapped correctly
 	glGenerateMipmap(GL_TEXTURE_2D);
@@ -836,8 +982,7 @@ int main()
 
 	glm::vec2 mouse(0, 0);
 	bool mouseButtonDown = false;
-
-	bool leftArrowPressed = false;
+	bool rotateOn = true;
 
 	while (!stopped)
 	{
@@ -1009,6 +1154,48 @@ int main()
 			mouseButtonDown = false;
 		}
 
+		// Shader Left Arrow
+		if (intersect(mouse, glm::vec4(50, 300, 100, 100)) && mouseButtonDown)
+		{
+			if (shaderSelector == 0)
+			{
+				/* if selector equals zero, set selector to be the value of the end of the shader vector,
+				* this prevents us from going out of bounds. */
+				shaderSelector = shaders.size() - 1;
+				std::cout << "Selector: " << shaderSelector << std::endl;
+			}
+			else
+			{
+				// Otherwise, continue decreasing selector to view previous shader.
+				shaderSelector--;
+				std::cout << "Selector: " << shaderSelector << std::endl;
+			}
+
+			std::cout << "Left arrow intersect True" << std::endl;
+			mouseButtonDown = false;	// Prevents holding down mouse button 
+		}
+
+		// Shader Right Arrow
+		if (intersect(mouse, glm::vec4(width - 150, 300, 100, 100)) && mouseButtonDown)
+		{
+			if (shaderSelector == shaders.size() - 1)
+			{
+				/* If selector is the same as our vector of shader (-1),
+				* set selector back to zero so we don't go out of bounds.*/
+				shaderSelector = 0;
+				std::cout << "Selector: " << shaderSelector << std::endl;
+			}
+			else
+			{
+				// Otherwise, continue increasing selector to view further shader. 
+				shaderSelector++;
+				std::cout << "Selector: " << shaderSelector << std::endl;
+			}
+
+			std::cout << "Right arrow intersect True" << std::endl;
+			mouseButtonDown = false;	// Prevents holding down mouse button 
+		}
+
 		// Left Arrow
 		if (intersect(mouse, glm::vec4(50, 450, 100, 100)) && mouseButtonDown)
 		{
@@ -1052,9 +1239,24 @@ int main()
 			mouseButtonDown = false;	// Prevents holding down mouse button 
 		}
 
+		// Rotate Icon 
+		if (intersect(mouse, glm::vec4(50, 125, 100, 100)) && mouseButtonDown && !rotateOn)
+		{
+			rotateOn = true;
+			std::cout << "Rotate intersect True" << std::endl;
+			mouseButtonDown = false;
+		}
+		else if (intersect(mouse, glm::vec4(50, 125, 100, 100)) && mouseButtonDown && rotateOn)
+		{
+			rotateOn = false;
+			std::cout << "Rotate intersect True" << std::endl;
+			mouseButtonDown = false;
+		}
 
 		// Set background to Cyan 
-		glClearColor(0.0f, 0.33f, 0.5f, 1.0f);
+		//glClearColor(0.0f, 0.33f, 0.5f, 1.0f);
+		glClearColor(0.33f, 0.33f, 0.33f, 1.0f);
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Drawing
@@ -1096,7 +1298,15 @@ int main()
 
 		// If we do rotate then translate, it will look like it will orbit around the model
 		glm::mat4 view(1.0f);
-		view = glm::rotate(view, glm::radians(rot), glm::vec3(0, 1, 0));
+		if (rotateOn)
+		{
+			view = glm::rotate(view, glm::radians(rot), glm::vec3(0, 1, 0));
+		}
+		else
+		{
+			view = glm::rotate(view, glm::radians(0.0f), glm::vec3(0, 1, 0));
+		}
+
 		view = glm::translate(view, glm::vec3(0, 0, 15));
 		//view = glm::translate(view, camPos);
 		glUniformMatrix4fv(viewLocs.at(shaderSelector), 1, GL_FALSE, glm::value_ptr(glm::inverse(view)));
@@ -1125,6 +1335,9 @@ int main()
 		//*****************************************************
 		//	ORTHOGRAPHIC PATH
 		//*****************************************************
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		glBindVertexArray(vao->getId());
 		glUseProgram(shaderProgramUI->getId());
@@ -1155,9 +1368,6 @@ int main()
 		// [HUD] Left Arrow
 		//*****************************************************
 
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 		glBindTexture(GL_TEXTURE_2D, leftArrowTextureId);
 		glBindVertexArray(leftArrowVAO->getId());
 
@@ -1177,9 +1387,6 @@ int main()
 		//*****************************************************
 		// [HUD] Right Arrow
 		//*****************************************************
-
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		glBindTexture(GL_TEXTURE_2D, rightArrowTextureId);
 		glBindVertexArray(rightArrowVAO->getId());
@@ -1201,15 +1408,12 @@ int main()
 		// [HUD] Model Icon (right)
 		//*****************************************************
 
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 		glBindTexture(GL_TEXTURE_2D, modelIconTextureId);
 		glBindVertexArray(modelIconVAO->getId());
 
 		glm::mat4 modelIconModel(1.0f);
 		modelIconModel = glm::translate(modelIconModel, glm::vec3(width - 125, height - 450, 0));
-		modelIconModel = glm::scale(modelIconModel, glm::vec3(50, 50, 1));
+		modelIconModel = glm::scale(modelIconModel, glm::vec3(40, 40, 1));
 
 		// Upload the model matrix
 		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(modelIconModel));
@@ -1224,15 +1428,12 @@ int main()
 		// [HUD] Model Icon (left)
 		//*****************************************************
 
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 		glBindTexture(GL_TEXTURE_2D, modelIconTextureId);
 		glBindVertexArray(modelIconVAO->getId());
 
 		glm::mat4 modelIconModelLeft(1.0f);
 		modelIconModelLeft = glm::translate(modelIconModelLeft, glm::vec3(125, height - 450, 0));
-		modelIconModelLeft = glm::scale(modelIconModelLeft, glm::vec3(50, 50, 1));
+		modelIconModelLeft = glm::scale(modelIconModelLeft, glm::vec3(40, 40, 1));
 
 		// Upload the model matrix
 		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(modelIconModelLeft));
@@ -1242,6 +1443,113 @@ int main()
 			glm::value_ptr(projection));
 
 		glDrawArrays(GL_TRIANGLES, 0, modelIconVAO->getVertCount());
+
+		//*****************************************************
+		// [HUD] Left Arrow (Shader)
+		//*****************************************************
+
+		glBindTexture(GL_TEXTURE_2D, leftArrowTextureId);
+		glBindVertexArray(leftArrowVAO->getId());
+
+		leftArrowModel = glm::mat4(1.0f);
+		leftArrowModel = glm::translate(leftArrowModel, glm::vec3(100, height - 350, 0));
+		leftArrowModel = glm::scale(leftArrowModel, glm::vec3(100, 100, 1));
+
+		// Upload the model matrix
+		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(leftArrowModel));
+
+		// Upload the projection matrix
+		glUniformMatrix4fv(projectionLocUI, 1, GL_FALSE,
+			glm::value_ptr(projection));
+
+		glDrawArrays(GL_TRIANGLES, 0, leftArrowVAO->getVertCount());
+
+		//*****************************************************
+		// [HUD] Right Arrow (Shader)
+		//*****************************************************
+
+		glBindTexture(GL_TEXTURE_2D, rightArrowTextureId);
+		glBindVertexArray(rightArrowVAO->getId());
+
+		rightArrowModel = glm::mat4(1.0f);
+		rightArrowModel = glm::translate(rightArrowModel, glm::vec3(width - 100, height - 350, 0));
+		rightArrowModel = glm::scale(rightArrowModel, glm::vec3(100, 100, 1));
+
+		// Upload the model matrix
+		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(rightArrowModel));
+
+		// Upload the projection matrix
+		glUniformMatrix4fv(projectionLocUI, 1, GL_FALSE,
+			glm::value_ptr(projection));
+
+		glDrawArrays(GL_TRIANGLES, 0, rightArrowVAO->getVertCount());
+
+		//*****************************************************
+		// [HUD] Shader Icon (Left)
+		//*****************************************************
+
+		glBindTexture(GL_TEXTURE_2D, shaderIconTextureId);
+		glBindVertexArray(vao->getId());
+
+		glm::mat4 shaderIconModel(1.0f);
+		shaderIconModel = glm::translate(shaderIconModel, glm::vec3(125, height - 300, 0));
+		shaderIconModel = glm::scale(shaderIconModel, glm::vec3(40, 40, 1));
+
+		// Upload the model matrix
+		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(shaderIconModel));
+
+		// Upload the projection matrix
+		glUniformMatrix4fv(projectionLocUI, 1, GL_FALSE,
+			glm::value_ptr(projection));
+
+		glDrawArrays(GL_TRIANGLES, 0, vao->getVertCount());
+
+		//*****************************************************
+		// [HUD] Shader Icon (Right)
+		//*****************************************************
+
+		glBindTexture(GL_TEXTURE_2D, shaderIconTextureId);
+		glBindVertexArray(vao->getId());
+
+		shaderIconModel = glm::mat4(1.0f);
+		shaderIconModel = glm::translate(shaderIconModel, glm::vec3(width - 125, height - 300, 0));
+		shaderIconModel = glm::scale(shaderIconModel, glm::vec3(40, 40, 1));
+
+		// Upload the model matrix
+		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(shaderIconModel));
+
+		// Upload the projection matrix
+		glUniformMatrix4fv(projectionLocUI, 1, GL_FALSE,
+			glm::value_ptr(projection));
+
+		glDrawArrays(GL_TRIANGLES, 0, vao->getVertCount());
+
+		//*****************************************************
+		// [HUD] Rotate Icon
+		//*****************************************************
+
+		if (rotateOn)
+		{
+			glBindTexture(GL_TEXTURE_2D, rotateIconActiveTextureId);
+		}
+		else if (!rotateOn)
+		{
+			glBindTexture(GL_TEXTURE_2D, rotateIconTextureId);
+		}
+		glBindVertexArray(vao->getId());
+
+		glm::mat4 rotateIconModel(1.0f);
+		rotateIconModel = glm::translate(rotateIconModel, glm::vec3(100, height - 175, 0));
+		rotateIconModel = glm::scale(rotateIconModel, glm::vec3(40, 40, 1));
+
+		// Upload the model matrix
+		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(rotateIconModel));
+
+		// Upload the projection matrix
+		glUniformMatrix4fv(projectionLocUI, 1, GL_FALSE,
+			glm::value_ptr(projection));
+
+		glDrawArrays(GL_TRIANGLES, 0, vao->getVertCount());
 
 		//*****************************************************
 		//	RESET THE STATE
