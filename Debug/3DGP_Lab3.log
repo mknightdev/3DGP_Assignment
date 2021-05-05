@@ -1,3 +1,3 @@
 ﻿  Source.cpp
-F:\Programming\Repos\3DGP_Lab3\3DGP_Lab3\Source.cpp(834,18): warning C4244: 'initializing': conversion from 'Uint32' to 'float', possible loss of data
+F:\Programming\Repos\3DGP_Lab3\3DGP_Lab3\Source.cpp(830,18): warning C4244: 'initializing': conversion from 'Uint32' to 'float', possible loss of data
   3DGP_Lab3.vcxproj -> F:\Programming\Repos\3DGP_Lab3\Debug\3DGP_Lab3.exe

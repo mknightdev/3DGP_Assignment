@@ -847,7 +847,7 @@ int main()
 		}
 
 		// Shader Left Arrow
-		if (intersect(mouse, glm::vec4(50, 300, 100, 100)) && mouseButtonDown)
+		if (intersect(mouse, glm::vec4(width - 300, 450, 100, 100)) && mouseButtonDown)
 		{
 			if (shaderSelector == 0)
 			{
@@ -868,7 +868,7 @@ int main()
 		}
 
 		// Shader Right Arrow
-		if (intersect(mouse, glm::vec4(width - 150, 300, 100, 100)) && mouseButtonDown)
+		if (intersect(mouse, glm::vec4(width - 150, 450, 100, 100)) && mouseButtonDown)
 		{
 			if (shaderSelector == shaders.size() - 1)
 			{
@@ -911,7 +911,7 @@ int main()
 		}
 
 		// Right Arrow
-		if (intersect(mouse, glm::vec4(width - 150, 450, 100, 100)) && mouseButtonDown)
+		if (intersect(mouse, glm::vec4(200, 450, 100, 100)) && mouseButtonDown)
 		{
 			if (modelSelector == models.size() - 1)
 			{
@@ -1058,7 +1058,7 @@ int main()
 		glDrawArrays(GL_TRIANGLES, 0, vao->getVertCount());
 
 		//*****************************************************
-		// [HUD] Left Arrow
+		// [HUD] Left Arrow (Model)
 		//*****************************************************
 
 		glBindTexture(GL_TEXTURE_2D, leftArrow->GetId());
@@ -1078,14 +1078,14 @@ int main()
 		glDrawArrays(GL_TRIANGLES, 0, leftArrowVAO->getVertCount());
 
 		//*****************************************************
-		// [HUD] Right Arrow
+		// [HUD] Right Arrow (Model)
 		//*****************************************************
 
 		glBindTexture(GL_TEXTURE_2D, rightArrow->GetId());
 		glBindVertexArray(rightArrowVAO->getId());
 
 		glm::mat4 rightArrowModel(1.0f);
-		rightArrowModel = glm::translate(rightArrowModel, glm::vec3(width - 100, height - 500, 0));
+		rightArrowModel = glm::translate(rightArrowModel, glm::vec3(250, height - 500, 0));
 		rightArrowModel = glm::scale(rightArrowModel, glm::vec3(100, 100, 1));
 
 		// Upload the model matrix
@@ -1098,26 +1098,6 @@ int main()
 		glDrawArrays(GL_TRIANGLES, 0, rightArrowVAO->getVertCount());
 
 		//*****************************************************
-		// [HUD] Model Icon (right)
-		//*****************************************************
-
-		glBindTexture(GL_TEXTURE_2D, modelIcon->GetId());
-		glBindVertexArray(modelIconVAO->getId());
-
-		glm::mat4 modelIconModel(1.0f);
-		modelIconModel = glm::translate(modelIconModel, glm::vec3(width - 125, height - 450, 0));
-		modelIconModel = glm::scale(modelIconModel, glm::vec3(40, 40, 1));
-
-		// Upload the model matrix
-		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(modelIconModel));
-
-		// Upload the projection matrix
-		glUniformMatrix4fv(projectionLocUI, 1, GL_FALSE,
-			glm::value_ptr(projection));
-
-		glDrawArrays(GL_TRIANGLES, 0, modelIconVAO->getVertCount());
-
-		//*****************************************************
 		// [HUD] Model Icon (left)
 		//*****************************************************
 
@@ -1125,7 +1105,7 @@ int main()
 		glBindVertexArray(modelIconVAO->getId());
 
 		glm::mat4 modelIconModelLeft(1.0f);
-		modelIconModelLeft = glm::translate(modelIconModelLeft, glm::vec3(125, height - 450, 0));
+		modelIconModelLeft = glm::translate(modelIconModelLeft, glm::vec3(175, height - 500, 0));
 		modelIconModelLeft = glm::scale(modelIconModelLeft, glm::vec3(40, 40, 1));
 
 		// Upload the model matrix
@@ -1145,7 +1125,7 @@ int main()
 		glBindVertexArray(leftArrowVAO->getId());
 
 		leftArrowModel = glm::mat4(1.0f);
-		leftArrowModel = glm::translate(leftArrowModel, glm::vec3(100, height - 350, 0));
+		leftArrowModel = glm::translate(leftArrowModel, glm::vec3(width - 250, height - 500, 0));
 		leftArrowModel = glm::scale(leftArrowModel, glm::vec3(100, 100, 1));
 
 		// Upload the model matrix
@@ -1165,7 +1145,7 @@ int main()
 		glBindVertexArray(rightArrowVAO->getId());
 
 		rightArrowModel = glm::mat4(1.0f);
-		rightArrowModel = glm::translate(rightArrowModel, glm::vec3(width - 100, height - 350, 0));
+		rightArrowModel = glm::translate(rightArrowModel, glm::vec3(width - 100, height - 500, 0));
 		rightArrowModel = glm::scale(rightArrowModel, glm::vec3(100, 100, 1));
 
 		// Upload the model matrix
@@ -1178,34 +1158,14 @@ int main()
 		glDrawArrays(GL_TRIANGLES, 0, rightArrowVAO->getVertCount());
 
 		//*****************************************************
-		// [HUD] Shader Icon (Left)
-		//*****************************************************
-
-		glBindTexture(GL_TEXTURE_2D, shaderIcon->GetId());
-		glBindVertexArray(vao->getId());
-
-		glm::mat4 shaderIconModel(1.0f);
-		shaderIconModel = glm::translate(shaderIconModel, glm::vec3(125, height - 300, 0));
-		shaderIconModel = glm::scale(shaderIconModel, glm::vec3(40, 40, 1));
-
-		// Upload the model matrix
-		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(shaderIconModel));
-
-		// Upload the projection matrix
-		glUniformMatrix4fv(projectionLocUI, 1, GL_FALSE,
-			glm::value_ptr(projection));
-
-		glDrawArrays(GL_TRIANGLES, 0, vao->getVertCount());
-
-		//*****************************************************
 		// [HUD] Shader Icon (Right)
 		//*****************************************************
 
 		glBindTexture(GL_TEXTURE_2D, shaderIcon->GetId());
 		glBindVertexArray(vao->getId());
 
-		shaderIconModel = glm::mat4(1.0f);
-		shaderIconModel = glm::translate(shaderIconModel, glm::vec3(width - 125, height - 300, 0));
+		glm::mat4 shaderIconModel(1.0f);
+		shaderIconModel = glm::translate(shaderIconModel, glm::vec3(width - 175, height - 500, 0));
 		shaderIconModel = glm::scale(shaderIconModel, glm::vec3(40, 40, 1));
 
 		// Upload the model matrix
