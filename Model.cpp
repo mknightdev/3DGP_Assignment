@@ -7,15 +7,22 @@ void Model::Bind(GLuint textureId, GLuint vaoId)
 	glBindVertexArray(vaoId);
 }
 
-void Model::SetPosition(int tX, int tY, int sX, int sY)
+void Model::SetPosition(int x, int y, int z)
 {
-	translateX = tX;
-	translateY = tY;
-	scaleX = sX;
-	scaleY = sY;
+	translateX = x;
+	translateY = y;
+	translateZ = z;
 
-	model = glm::translate(model, glm::vec3(translateX, translateY, 0));
-	model = glm::scale(model, glm::vec3(scaleX, scaleY, 1));
+	model = glm::translate(model, glm::vec3(translateX, translateY, translateZ));
+}
+
+void Model::SetScale(int x, int y, int z)
+{
+	scaleX = x;
+	scaleY = y;
+	scaleZ = z;
+
+	model = glm::scale(model, glm::vec3(scaleX, scaleY, scaleZ));
 }
 
 void Model::Draw(GLint modelLoc, GLint projectionLoc, glm::mat4 projection, size_t vao)
@@ -34,4 +41,5 @@ glm::mat4 Model::GetModel()
 {
 	return model;
 }
+
 

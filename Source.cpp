@@ -539,15 +539,15 @@ int main()
 	//	[IMAGE] LEFT ARROW   
 	//*****************************************************
 
-	std::shared_ptr<Texture> leftArrow = std::make_shared<Texture>(stbi_load("models/leftarrow.png", &w, &h, NULL, 4), w, h);
-	std::shared_ptr<Texture> leftArrowActive = std::make_shared<Texture>(stbi_load("models/leftarrowactive.png", &w, &h, NULL, 4), w, h);
+	std::shared_ptr<Texture> leftArrowTexture = std::make_shared<Texture>(stbi_load("models/leftarrow.png", &w, &h, NULL, 4), w, h);
+	std::shared_ptr<Texture> leftArrowActiveTexture = std::make_shared<Texture>(stbi_load("models/leftarrowactive.png", &w, &h, NULL, 4), w, h);
 
 	//*****************************************************
 	//	[IMAGE] RIGHT ARROW   
 	//*****************************************************
 
-	std::shared_ptr<Texture> rightArrow = std::make_shared<Texture>(stbi_load("models/rightarrow.png", &w, &h, NULL, 4), w, h);
-	std::shared_ptr<Texture> rightArrowActive = std::make_shared<Texture>(stbi_load("models/rightarroveactive.png", &w, &h, NULL, 4), w, h);
+	std::shared_ptr<Texture> rightArrowTexture = std::make_shared<Texture>(stbi_load("models/rightarrow.png", &w, &h, NULL, 4), w, h);
+	std::shared_ptr<Texture> rightArrowActiveTexture = std::make_shared<Texture>(stbi_load("models/rightarroveactive.png", &w, &h, NULL, 4), w, h);
 
 	//*****************************************************
 	//	[IMAGE] MODEL ICON
@@ -559,14 +559,14 @@ int main()
 	//	[IMAGE] SHADER ICON
 	//*****************************************************
 
-	std::shared_ptr<Texture> shaderIcon = std::make_shared<Texture>(stbi_load("models/shadericon.png", &w, &h, NULL, 4), w, h);
+	std::shared_ptr<Texture> shaderIconTexture = std::make_shared<Texture>(stbi_load("models/shadericon.png", &w, &h, NULL, 4), w, h);
 
 	//*****************************************************
 	//	[IMAGE] ROTATE ICON
 	//*****************************************************
 
-	std::shared_ptr<Texture> rotateIcon = std::make_shared<Texture>(stbi_load("models/rotate.png", &w, &h, NULL, 4), w, h);
-	std::shared_ptr<Texture> rotateActiveIcon = std::make_shared<Texture>(stbi_load("models/rotateactive.png", &w, &h, NULL, 4), w, h);
+	std::shared_ptr<Texture> rotateIconTexture = std::make_shared<Texture>(stbi_load("models/rotate.png", &w, &h, NULL, 4), w, h);
+	std::shared_ptr<Texture> rotateActiveIconTexture = std::make_shared<Texture>(stbi_load("models/rotateactive.png", &w, &h, NULL, 4), w, h);
 
 	//*****************************************************
 	//	MAIN LOOP
@@ -790,7 +790,7 @@ int main()
 		// Shader Right Arrow
 		if (intersect(mouse, glm::vec4(width - 150, 450, 100, 100)) && mouseButtonDown)
 		{
-			glBindTexture(GL_TEXTURE_2D, rightArrowActive->GetId());
+			glBindTexture(GL_TEXTURE_2D, rightArrowActiveTexture->GetId());
 			if (shaderSelector == shaders.size() - 1)
 			{
 				/* If selector is the same as our vector of shader (-1),
@@ -981,41 +981,21 @@ int main()
 		// [HUD] Left Arrow (Model)
 		//*****************************************************
 
-		glBindTexture(GL_TEXTURE_2D, leftArrow->GetId());
-		glBindVertexArray(vao->getId());
-
-		glm::mat4 leftArrowModel(1.0f);
-		leftArrowModel = glm::translate(leftArrowModel, glm::vec3(100, height - 500, 0));
-		leftArrowModel = glm::scale(leftArrowModel, glm::vec3(100, 100, 1));
-
-		// Upload the model matrix
-		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(leftArrowModel));
-
-		// Upload the projection matrix
-		glUniformMatrix4fv(projectionLocUI, 1, GL_FALSE,
-			glm::value_ptr(projection));
-
-		glDrawArrays(GL_TRIANGLES, 0, vao->getVertCount());
+		std::shared_ptr<Model> leftArrow = std::make_shared<Model>();
+		leftArrow->Bind(leftArrowTexture->GetId(), vao->getId());
+		leftArrow->SetPosition(100, height - 500, 0);
+		leftArrow->SetScale(100, 100, 1);
+		leftArrow->Draw(modelLocUI, projectionLocUI, projection, vao->getVertCount());
 
 		//*****************************************************
 		// [HUD] Right Arrow (Model)
 		//*****************************************************
 
-		glBindTexture(GL_TEXTURE_2D, rightArrow->GetId());
-		glBindVertexArray(vao->getId());
-
-		glm::mat4 rightArrowModel(1.0f);
-		rightArrowModel = glm::translate(rightArrowModel, glm::vec3(250, height - 500, 0));
-		rightArrowModel = glm::scale(rightArrowModel, glm::vec3(100, 100, 1));
-
-		// Upload the model matrix
-		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(rightArrowModel));
-
-		// Upload the projection matrix
-		glUniformMatrix4fv(projectionLocUI, 1, GL_FALSE,
-			glm::value_ptr(projection));
-
-		glDrawArrays(GL_TRIANGLES, 0, vao->getVertCount());
+		std::shared_ptr<Model> rightArrow = std::make_shared<Model>();
+		rightArrow->Bind(rightArrowTexture->GetId(), vao->getId());
+		rightArrow->SetPosition(250, height - 500, 0);
+		rightArrow->SetScale(100, 100, 1);
+		rightArrow->Draw(modelLocUI, projectionLocUI, projection, vao->getVertCount());
 
 		//*****************************************************
 		// [HUD] Model Icon
@@ -1023,84 +1003,56 @@ int main()
 
 		std::shared_ptr<Model> modelIcon = std::make_shared<Model>();
 		modelIcon->Bind(modelIconTexture->GetId(), vao->getId());
-		modelIcon->SetPosition(175, height - 500, 40, 40);
+		modelIcon->SetPosition(175, height - 500, 0);
+		modelIcon->SetScale(40, 40, 1);
 		modelIcon->Draw(modelLocUI, projectionLocUI, projection, vao->getVertCount());
 
 		//*****************************************************
 		// [HUD] Left Arrow (Shader)
 		//*****************************************************
 
-		glBindTexture(GL_TEXTURE_2D, leftArrow->GetId());
-		glBindVertexArray(vao->getId());
-
-		leftArrowModel = glm::mat4(1.0f);
-		leftArrowModel = glm::translate(leftArrowModel, glm::vec3(width - 250, height - 500, 0));
-		leftArrowModel = glm::scale(leftArrowModel, glm::vec3(100, 100, 1));
-
-		// Upload the model matrix
-		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(leftArrowModel));
-
-		// Upload the projection matrix
-		glUniformMatrix4fv(projectionLocUI, 1, GL_FALSE,
-			glm::value_ptr(projection));
-
-		glDrawArrays(GL_TRIANGLES, 0, vao->getVertCount());
+		leftArrow->Bind(leftArrowTexture->GetId(), vao->getId());
+		leftArrow->SetPosition(width - 250, height - 500, 0);
+		leftArrow->SetScale(100, 100, 1);
+		leftArrow->Draw(modelLocUI, projectionLocUI, projection, vao->getVertCount());
 
 		//*****************************************************
 		// [HUD] Right Arrow (Shader)
 		//*****************************************************
 
-		glBindTexture(GL_TEXTURE_2D, rightArrow->GetId());
-		glBindVertexArray(vao->getId());
-
-		rightArrowModel = glm::mat4(1.0f);
-		rightArrowModel = glm::translate(rightArrowModel, glm::vec3(width - 100, height - 500, 0));
-		rightArrowModel = glm::scale(rightArrowModel, glm::vec3(100, 100, 1));
-
-		// Upload the model matrix
-		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(rightArrowModel));
-
-		// Upload the projection matrix
-		glUniformMatrix4fv(projectionLocUI, 1, GL_FALSE,
-			glm::value_ptr(projection));
-
-		glDrawArrays(GL_TRIANGLES, 0, vao->getVertCount());
+		rightArrow->Bind(rightArrowTexture->GetId(), vao->getId());
+		rightArrow->SetPosition(width - 100, height - 500, 0);
+		rightArrow->SetScale(100, 100, 1);
+		rightArrow->Draw(modelLocUI, projectionLocUI, projection, vao->getVertCount());
 
 		//*****************************************************
 		// [HUD] Shader Icon
 		//*****************************************************
 
-		std::shared_ptr<Model> testModel = std::make_shared<Model>();
-		testModel->Bind(shaderIcon->GetId(), vao->getId());
-		testModel->SetPosition(width - 175, height - 500, 40, 40);
-		testModel->Draw(modelLocUI, projectionLocUI, projection, vao->getVertCount());
+		std::shared_ptr<Model> shaderIcon = std::make_shared<Model>();
+		shaderIcon->Bind(shaderIconTexture->GetId(), vao->getId());
+		shaderIcon->SetPosition(width - 175, height - 500, 0);
+		shaderIcon->SetScale(40, 40, 1);
+		shaderIcon->Draw(modelLocUI, projectionLocUI, projection, vao->getVertCount());
 			
 		//*****************************************************
 		// [HUD] Rotate Icon
 		//*****************************************************
 
+		std::shared_ptr<Model> rotateIcon = std::make_shared<Model>();
+
 		if (rotateOn)
 		{
-			glBindTexture(GL_TEXTURE_2D, rotateActiveIcon->GetId());
+			rotateIcon->Bind(rotateActiveIconTexture->GetId(), vao->getId());
 		}
 		else if (!rotateOn)
 		{
-			glBindTexture(GL_TEXTURE_2D, rotateIcon->GetId());
+			rotateIcon->Bind(rotateIconTexture->GetId(), vao->getId());
 		}
-		glBindVertexArray(vao->getId());
 
-		glm::mat4 rotateIconModel(1.0f);
-		rotateIconModel = glm::translate(rotateIconModel, glm::vec3(100, height - 175, 0));
-		rotateIconModel = glm::scale(rotateIconModel, glm::vec3(40, 40, 1));
-
-		// Upload the model matrix
-		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(rotateIconModel));
-
-		// Upload the projection matrix
-		glUniformMatrix4fv(projectionLocUI, 1, GL_FALSE,
-			glm::value_ptr(projection));
-
-		glDrawArrays(GL_TRIANGLES, 0, vao->getVertCount());
+		rotateIcon->SetPosition(100, height - 175, 0);
+		rotateIcon->SetScale(40, 40, 1);
+		rotateIcon->Draw(modelLocUI, projectionLocUI, projection, vao->getVertCount());
 
 		//*****************************************************
 		//	RESET THE STATE
