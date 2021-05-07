@@ -613,7 +613,17 @@ int main()
 	int w = 0;
 	int h = 0;
 
-	std::shared_ptr<Texture> data = std::make_shared<Texture>(stbi_load("models/curuthers/Whiskers_diffuse.png", &w, &h, NULL, 4), w, h);
+
+
+	std::shared_ptr<Texture> catTexture = std::make_shared<Texture>(stbi_load("models/curuthers/Whiskers_diffuse.png", &w, &h, NULL, 4), w, h);
+	std::shared_ptr<Texture> skeletonTexture = std::make_shared<Texture>(stbi_load("models/skeleton/skeleton_diffuse.png", &w, &h, NULL, 4), w, h);
+	std::shared_ptr<Texture> crocTexture = std::make_shared<Texture>(stbi_load("models/croc/croc_diffuse.png", &w, &h, NULL, 4), w, h);
+
+	std::vector<std::shared_ptr<Texture>> modelTextures;
+	modelTextures.push_back(catTexture);
+	modelTextures.push_back(skeletonTexture);
+	modelTextures.push_back(crocTexture);
+
 
 	//*****************************************************
 	//	[IMAGE] LEFT ARROW   
@@ -870,6 +880,7 @@ int main()
 		// Shader Right Arrow
 		if (intersect(mouse, glm::vec4(width - 150, 450, 100, 100)) && mouseButtonDown)
 		{
+			glBindTexture(GL_TEXTURE_2D, rightArrowActive->GetId());
 			if (shaderSelector == shaders.size() - 1)
 			{
 				/* If selector is the same as our vector of shader (-1),
@@ -956,11 +967,9 @@ int main()
 		glUseProgram(shaders.at(shaderSelector)->getId());
 		//glBindVertexArray(vao->getId());
 		// Cat:
+		//glBindTexture(GL_TEXTURE_2D, data->GetId());
+		glBindTexture(GL_TEXTURE_2D, modelTextures.at(modelSelector)->GetId());
 		glBindVertexArray(models.at(modelSelector)->getId());
-		glBindTexture(GL_TEXTURE_2D, data->GetId());
-		//glBindTexture(GL_TEXTURE_2D, testTexture.GetId());
-		//glBindTexture(GL_TEXTURE_2D, testTexture2->GetId());
-		//glBindTexture(GL_TEXTURE_2D, textures->getId());
 
 		//glUniform1f(pulseLocs.at(shaderSelector), pulse);
 
@@ -998,6 +1007,7 @@ int main()
 		else
 		{
 			view = glm::rotate(view, glm::radians(0.0f), glm::vec3(0, 1, 0));
+			rot = 0;
 		}
 
 		view = glm::translate(view, glm::vec3(0, 0, 15));
