@@ -4,6 +4,7 @@
 #include "VertexArray.h"
 #include "ShaderProgram.h"
 #include "Texture.h"
+#include "Model.h"
 
 /* Lab 4 - Start*/
 // Needs to be defined before the include in exactly
@@ -113,95 +114,6 @@ int main()
 	vao->setBuffer(1, texturesVbo);
 
 	//*****************************************************
-	//	[UI] Arrows - VBO & VAO
-	//*****************************************************
-
-	// LEFT ARROW
-	std::shared_ptr<VertexBuffer> leftArrowPosVBO = std::make_shared<VertexBuffer>();
-
-	// Added to data vector (floats)
-	// Tri 1
-	leftArrowPosVBO->add(glm::vec3(-0.5f, -0.5f, 0.0f));	// Bottom Left
-	leftArrowPosVBO->add(glm::vec3(0.5f, -0.5f, 0.0f));	// Bottom Right
-	leftArrowPosVBO->add(glm::vec3(-0.5f, 0.5f, 0.0f));	// Top Right
-
-	// Tri 2
-	leftArrowPosVBO->add(glm::vec3(0.5f, 0.5f, 0.0f));		// Top Right
-	leftArrowPosVBO->add(glm::vec3(0.5f, -0.5f, 0.0f));	// Bottom Right
-	leftArrowPosVBO->add(glm::vec3(-0.5f, 0.5f, 0.0f));	// Top Left
-
-	std::shared_ptr<VertexBuffer> leftArrowTexturesVBO = std::make_shared<VertexBuffer>();
-
-	leftArrowTexturesVBO->add(glm::vec2(0.0f, 0.0f));
-	leftArrowTexturesVBO->add(glm::vec2(1.0f, 0.0f));
-	leftArrowTexturesVBO->add(glm::vec2(0.0f, -1.0f));
-	leftArrowTexturesVBO->add(glm::vec2(1.0f, -1.0f));
-	leftArrowTexturesVBO->add(glm::vec2(1.0f, 0.0f));
-	leftArrowTexturesVBO->add(glm::vec2(0.0f, -1.0f));
-
-	std::shared_ptr<VertexArray> leftArrowVAO = std::make_shared<VertexArray>();
-	leftArrowVAO->setBuffer(0, leftArrowPosVBO);
-	leftArrowVAO->setBuffer(1, leftArrowTexturesVBO);
-
-	// RIGHT ARROW
-	std::shared_ptr<VertexBuffer> rightArrowPosVBO = std::make_shared<VertexBuffer>();
-
-	// Added to data vector (floats)
-	// Tri 1
-	rightArrowPosVBO->add(glm::vec3(-0.5f, -0.5f, 0.0f));	// Bottom Left
-	rightArrowPosVBO->add(glm::vec3(0.5f, -0.5f, 0.0f));	// Bottom Right
-	rightArrowPosVBO->add(glm::vec3(-0.5f, 0.5f, 0.0f));	// Top Right
-
-	// Tri 2
-	rightArrowPosVBO->add(glm::vec3(0.5f, 0.5f, 0.0f));		// Top Right
-	rightArrowPosVBO->add(glm::vec3(0.5f, -0.5f, 0.0f));	// Bottom Right
-	rightArrowPosVBO->add(glm::vec3(-0.5f, 0.5f, 0.0f));	// Top Left
-
-	std::shared_ptr<VertexBuffer> rightArrowTexturesVBO = std::make_shared<VertexBuffer>();
-
-	rightArrowTexturesVBO->add(glm::vec2(0.0f, 0.0f));
-	rightArrowTexturesVBO->add(glm::vec2(1.0f, 0.0f));
-	rightArrowTexturesVBO->add(glm::vec2(0.0f, -1.0f));
-	rightArrowTexturesVBO->add(glm::vec2(1.0f, -1.0f));
-	rightArrowTexturesVBO->add(glm::vec2(1.0f, 0.0f));
-	rightArrowTexturesVBO->add(glm::vec2(0.0f, -1.0f));
-
-	std::shared_ptr<VertexArray> rightArrowVAO = std::make_shared<VertexArray>();
-	rightArrowVAO->setBuffer(0, rightArrowPosVBO);
-	rightArrowVAO->setBuffer(1, rightArrowTexturesVBO);
-
-	//*****************************************************
-	//	[UI] ICONS - VBO & VAO
-	//*****************************************************
-
-	// MODEL ICON
-	std::shared_ptr<VertexBuffer> modelIconPosVBO = std::make_shared<VertexBuffer>();
-
-	// Added to data vector (floats)
-	// Tri 1
-	modelIconPosVBO->add(glm::vec3(-0.5f, -0.5f, 0.0f));	// Bottom Left
-	modelIconPosVBO->add(glm::vec3(0.5f, -0.5f, 0.0f));	// Bottom Right
-	modelIconPosVBO->add(glm::vec3(-0.5f, 0.5f, 0.0f));	// Top Right
-
-	// Tri 2
-	modelIconPosVBO->add(glm::vec3(0.5f, 0.5f, 0.0f));		// Top Right
-	modelIconPosVBO->add(glm::vec3(0.5f, -0.5f, 0.0f));	// Bottom Right
-	modelIconPosVBO->add(glm::vec3(-0.5f, 0.5f, 0.0f));	// Top Left
-
-	std::shared_ptr<VertexBuffer> modelIconTexturesVBO = std::make_shared<VertexBuffer>();
-
-	modelIconTexturesVBO->add(glm::vec2(0.0f, 0.0f));
-	modelIconTexturesVBO->add(glm::vec2(1.0f, 0.0f));
-	modelIconTexturesVBO->add(glm::vec2(0.0f, -1.0f));
-	modelIconTexturesVBO->add(glm::vec2(1.0f, -1.0f));
-	modelIconTexturesVBO->add(glm::vec2(1.0f, 0.0f));
-	modelIconTexturesVBO->add(glm::vec2(0.0f, -1.0f));
-
-	std::shared_ptr<VertexArray> modelIconVAO = std::make_shared<VertexArray>();
-	modelIconVAO->setBuffer(0, modelIconPosVBO);
-	modelIconVAO->setBuffer(1, modelIconTexturesVBO);
-
-	//*****************************************************
 	//	READ IN FROM FILE
 	//*****************************************************
 
@@ -221,15 +133,15 @@ int main()
 
 	// path is the file location
 	//std::shared_ptr<VertexArray> cat = std::make_shared<VertexArray>(modelSettings);
-	std::shared_ptr<VertexArray> cat = std::make_shared<VertexArray>("models/curuthers/curuthers.obj");
-	std::shared_ptr<VertexArray> skeleton = std::make_shared<VertexArray>("models/skeleton/skeleton.obj");
-	std::shared_ptr<VertexArray> croc = std::make_shared<VertexArray>("models/croc/croc.obj");
+	std::shared_ptr<VertexArray> catVA = std::make_shared<VertexArray>("models/curuthers/curuthers.obj");
+	std::shared_ptr<VertexArray> skeletonVA = std::make_shared<VertexArray>("models/skeleton/skeleton.obj");
+	std::shared_ptr<VertexArray> crocVA = std::make_shared<VertexArray>("models/croc/croc.obj");
 
 	std::vector<std::shared_ptr<VertexArray>> models;
 
-	models.push_back(cat);
-	models.push_back(skeleton);
-	models.push_back(croc);
+	models.push_back(catVA);
+	models.push_back(skeletonVA);
+	models.push_back(crocVA);
 
 	//*****************************************************
 	//	[VERT SHADER] SPECULAR LIGHTING
@@ -606,14 +518,12 @@ int main()
 	inverseViewLocs.push_back(-1);
 
 	//*****************************************************
-	//	[IMAGE] LOAD  
+	//	[IMAGE] MODEL TEXTURES
 	//	- File needs to be placed next to the project file. 
 	//*****************************************************
 
 	int w = 0;
 	int h = 0;
-
-
 
 	std::shared_ptr<Texture> catTexture = std::make_shared<Texture>(stbi_load("models/curuthers/Whiskers_diffuse.png", &w, &h, NULL, 4), w, h);
 	std::shared_ptr<Texture> skeletonTexture = std::make_shared<Texture>(stbi_load("models/skeleton/skeleton_diffuse.png", &w, &h, NULL, 4), w, h);
@@ -643,7 +553,7 @@ int main()
 	//	[IMAGE] MODEL ICON
 	//*****************************************************
 
-	std::shared_ptr<Texture> modelIcon = std::make_shared<Texture>(stbi_load("models/modelicon.png", &w, &h, NULL, 4), w, h);
+	std::shared_ptr<Texture> modelIconTexture = std::make_shared<Texture>(stbi_load("models/modelicon.png", &w, &h, NULL, 4), w, h);
 
 	//*****************************************************
 	//	[IMAGE] SHADER ICON
@@ -1072,7 +982,7 @@ int main()
 		//*****************************************************
 
 		glBindTexture(GL_TEXTURE_2D, leftArrow->GetId());
-		glBindVertexArray(leftArrowVAO->getId());
+		glBindVertexArray(vao->getId());
 
 		glm::mat4 leftArrowModel(1.0f);
 		leftArrowModel = glm::translate(leftArrowModel, glm::vec3(100, height - 500, 0));
@@ -1085,14 +995,14 @@ int main()
 		glUniformMatrix4fv(projectionLocUI, 1, GL_FALSE,
 			glm::value_ptr(projection));
 
-		glDrawArrays(GL_TRIANGLES, 0, leftArrowVAO->getVertCount());
+		glDrawArrays(GL_TRIANGLES, 0, vao->getVertCount());
 
 		//*****************************************************
 		// [HUD] Right Arrow (Model)
 		//*****************************************************
 
 		glBindTexture(GL_TEXTURE_2D, rightArrow->GetId());
-		glBindVertexArray(rightArrowVAO->getId());
+		glBindVertexArray(vao->getId());
 
 		glm::mat4 rightArrowModel(1.0f);
 		rightArrowModel = glm::translate(rightArrowModel, glm::vec3(250, height - 500, 0));
@@ -1105,34 +1015,23 @@ int main()
 		glUniformMatrix4fv(projectionLocUI, 1, GL_FALSE,
 			glm::value_ptr(projection));
 
-		glDrawArrays(GL_TRIANGLES, 0, rightArrowVAO->getVertCount());
+		glDrawArrays(GL_TRIANGLES, 0, vao->getVertCount());
 
 		//*****************************************************
-		// [HUD] Model Icon (left)
+		// [HUD] Model Icon
 		//*****************************************************
 
-		glBindTexture(GL_TEXTURE_2D, modelIcon->GetId());
-		glBindVertexArray(modelIconVAO->getId());
-
-		glm::mat4 modelIconModelLeft(1.0f);
-		modelIconModelLeft = glm::translate(modelIconModelLeft, glm::vec3(175, height - 500, 0));
-		modelIconModelLeft = glm::scale(modelIconModelLeft, glm::vec3(40, 40, 1));
-
-		// Upload the model matrix
-		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(modelIconModelLeft));
-
-		// Upload the projection matrix
-		glUniformMatrix4fv(projectionLocUI, 1, GL_FALSE,
-			glm::value_ptr(projection));
-
-		glDrawArrays(GL_TRIANGLES, 0, modelIconVAO->getVertCount());
+		std::shared_ptr<Model> modelIcon = std::make_shared<Model>();
+		modelIcon->Bind(modelIconTexture->GetId(), vao->getId());
+		modelIcon->SetPosition(175, height - 500, 40, 40);
+		modelIcon->Draw(modelLocUI, projectionLocUI, projection, vao->getVertCount());
 
 		//*****************************************************
 		// [HUD] Left Arrow (Shader)
 		//*****************************************************
 
 		glBindTexture(GL_TEXTURE_2D, leftArrow->GetId());
-		glBindVertexArray(leftArrowVAO->getId());
+		glBindVertexArray(vao->getId());
 
 		leftArrowModel = glm::mat4(1.0f);
 		leftArrowModel = glm::translate(leftArrowModel, glm::vec3(width - 250, height - 500, 0));
@@ -1145,14 +1044,14 @@ int main()
 		glUniformMatrix4fv(projectionLocUI, 1, GL_FALSE,
 			glm::value_ptr(projection));
 
-		glDrawArrays(GL_TRIANGLES, 0, leftArrowVAO->getVertCount());
+		glDrawArrays(GL_TRIANGLES, 0, vao->getVertCount());
 
 		//*****************************************************
 		// [HUD] Right Arrow (Shader)
 		//*****************************************************
 
 		glBindTexture(GL_TEXTURE_2D, rightArrow->GetId());
-		glBindVertexArray(rightArrowVAO->getId());
+		glBindVertexArray(vao->getId());
 
 		rightArrowModel = glm::mat4(1.0f);
 		rightArrowModel = glm::translate(rightArrowModel, glm::vec3(width - 100, height - 500, 0));
@@ -1165,28 +1064,17 @@ int main()
 		glUniformMatrix4fv(projectionLocUI, 1, GL_FALSE,
 			glm::value_ptr(projection));
 
-		glDrawArrays(GL_TRIANGLES, 0, rightArrowVAO->getVertCount());
-
-		//*****************************************************
-		// [HUD] Shader Icon (Right)
-		//*****************************************************
-
-		glBindTexture(GL_TEXTURE_2D, shaderIcon->GetId());
-		glBindVertexArray(vao->getId());
-
-		glm::mat4 shaderIconModel(1.0f);
-		shaderIconModel = glm::translate(shaderIconModel, glm::vec3(width - 175, height - 500, 0));
-		shaderIconModel = glm::scale(shaderIconModel, glm::vec3(40, 40, 1));
-
-		// Upload the model matrix
-		glUniformMatrix4fv(modelLocUI, 1, GL_FALSE, glm::value_ptr(shaderIconModel));
-
-		// Upload the projection matrix
-		glUniformMatrix4fv(projectionLocUI, 1, GL_FALSE,
-			glm::value_ptr(projection));
-
 		glDrawArrays(GL_TRIANGLES, 0, vao->getVertCount());
 
+		//*****************************************************
+		// [HUD] Shader Icon
+		//*****************************************************
+
+		std::shared_ptr<Model> testModel = std::make_shared<Model>();
+		testModel->Bind(shaderIcon->GetId(), vao->getId());
+		testModel->SetPosition(width - 175, height - 500, 40, 40);
+		testModel->Draw(modelLocUI, projectionLocUI, projection, vao->getVertCount());
+			
 		//*****************************************************
 		// [HUD] Rotate Icon
 		//*****************************************************
