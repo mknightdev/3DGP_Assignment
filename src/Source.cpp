@@ -109,15 +109,64 @@ int main()
 	//	OBTAIN OBJECTS
 	//*****************************************************
 
-	std::shared_ptr<VertexArray> catVA = std::make_shared<VertexArray>("models/curuthers/curuthers.obj");
-	std::shared_ptr<VertexArray> skeletonVA = std::make_shared<VertexArray>("models/skeleton/skeleton.obj");
-	std::shared_ptr<VertexArray> crocVA = std::make_shared<VertexArray>("models/croc/croc.obj");
+	int w = 0;
+	int h = 0;
+
+	// Model destination
+	std::string modelObject;
+	std::string modelTextures;
 
 	std::vector<std::shared_ptr<VertexArray>> models;
+	std::vector<std::shared_ptr<Texture>> textures;
 
-	models.push_back(catVA);
-	models.push_back(skeletonVA);
-	models.push_back(crocVA);
+	// Model settings
+	std::ifstream readFile("Model_Settings.txt");
+
+	while (readFile >> modelObject >> modelTextures)
+	{
+		std::cout << modelObject << std::endl;
+		std::cout << modelTextures << std::endl;
+		std::shared_ptr<VertexArray> object = std::make_shared<VertexArray>(modelObject);
+		std::shared_ptr<Texture> texture = std::make_shared<Texture>(modelTextures, w, h);
+		models.push_back(object);
+		textures.push_back(texture);
+	}
+
+	// Close the file, as it's no longer needed. 
+	readFile.close();
+
+	//*****************************************************
+	//	[IMAGE] LEFT ARROW   
+	//*****************************************************
+
+	std::shared_ptr<Texture> leftArrowTexture = std::make_shared<Texture>(stbi_load("models/leftarrow.png", &w, &h, NULL, 4), w, h);
+	std::shared_ptr<Texture> leftArrowActiveTexture = std::make_shared<Texture>(stbi_load("models/leftarrowactive.png", &w, &h, NULL, 4), w, h);
+
+	//*****************************************************
+	//	[IMAGE] RIGHT ARROW   
+	//*****************************************************
+
+	std::shared_ptr<Texture> rightArrowTexture = std::make_shared<Texture>(stbi_load("models/rightarrow.png", &w, &h, NULL, 4), w, h);
+	std::shared_ptr<Texture> rightArrowActiveTexture = std::make_shared<Texture>(stbi_load("models/rightarroveactive.png", &w, &h, NULL, 4), w, h);
+
+	//*****************************************************
+	//	[IMAGE] MODEL ICON
+	//*****************************************************
+
+	std::shared_ptr<Texture> modelIconTexture = std::make_shared<Texture>(stbi_load("models/modelicon.png", &w, &h, NULL, 4), w, h);
+
+	//*****************************************************
+	//	[IMAGE] SHADER ICON
+	//*****************************************************
+
+	std::shared_ptr<Texture> shaderIconTexture = std::make_shared<Texture>(stbi_load("models/shadericon.png", &w, &h, NULL, 4), w, h);
+
+	//*****************************************************
+	//	[IMAGE] ROTATE ICON
+	//*****************************************************
+
+	std::shared_ptr<Texture> rotateIconTexture = std::make_shared<Texture>(stbi_load("models/rotate.png", &w, &h, NULL, 4), w, h);
+	std::shared_ptr<Texture> rotateActiveIconTexture = std::make_shared<Texture>(stbi_load("models/rotateactive.png", &w, &h, NULL, 4), w, h);
 
 	//*****************************************************
 	//	[VERT SHADER] SPECULAR LIGHTING
@@ -507,56 +556,7 @@ int main()
 	inverseViewLocs.push_back(-1);
 	inverseViewLocs.push_back(inverseViewLocSpecular);
 
-	//*****************************************************
-	//	[IMAGE] MODEL TEXTURES
-	//	- File needs to be placed next to the project file. 
-	//*****************************************************
 
-	int w = 0;
-	int h = 0;
-
-	std::shared_ptr<Texture> catTexture = std::make_shared<Texture>(stbi_load("models/curuthers/Whiskers_diffuse.png", &w, &h, NULL, 4), w, h);
-	std::shared_ptr<Texture> skeletonTexture = std::make_shared<Texture>(stbi_load("models/skeleton/skeleton_diffuse.png", &w, &h, NULL, 4), w, h);
-	std::shared_ptr<Texture> crocTexture = std::make_shared<Texture>(stbi_load("models/croc/croc_diffuse.png", &w, &h, NULL, 4), w, h);
-
-	std::vector<std::shared_ptr<Texture>> modelTextures;
-	modelTextures.push_back(catTexture);
-	modelTextures.push_back(skeletonTexture);
-	modelTextures.push_back(crocTexture);
-
-
-	//*****************************************************
-	//	[IMAGE] LEFT ARROW   
-	//*****************************************************
-
-	std::shared_ptr<Texture> leftArrowTexture = std::make_shared<Texture>(stbi_load("models/leftarrow.png", &w, &h, NULL, 4), w, h);
-	std::shared_ptr<Texture> leftArrowActiveTexture = std::make_shared<Texture>(stbi_load("models/leftarrowactive.png", &w, &h, NULL, 4), w, h);
-
-	//*****************************************************
-	//	[IMAGE] RIGHT ARROW   
-	//*****************************************************
-
-	std::shared_ptr<Texture> rightArrowTexture = std::make_shared<Texture>(stbi_load("models/rightarrow.png", &w, &h, NULL, 4), w, h);
-	std::shared_ptr<Texture> rightArrowActiveTexture = std::make_shared<Texture>(stbi_load("models/rightarroveactive.png", &w, &h, NULL, 4), w, h);
-
-	//*****************************************************
-	//	[IMAGE] MODEL ICON
-	//*****************************************************
-
-	std::shared_ptr<Texture> modelIconTexture = std::make_shared<Texture>(stbi_load("models/modelicon.png", &w, &h, NULL, 4), w, h);
-
-	//*****************************************************
-	//	[IMAGE] SHADER ICON
-	//*****************************************************
-
-	std::shared_ptr<Texture> shaderIconTexture = std::make_shared<Texture>(stbi_load("models/shadericon.png", &w, &h, NULL, 4), w, h);
-
-	//*****************************************************
-	//	[IMAGE] ROTATE ICON
-	//*****************************************************
-
-	std::shared_ptr<Texture> rotateIconTexture = std::make_shared<Texture>(stbi_load("models/rotate.png", &w, &h, NULL, 4), w, h);
-	std::shared_ptr<Texture> rotateActiveIconTexture = std::make_shared<Texture>(stbi_load("models/rotateactive.png", &w, &h, NULL, 4), w, h);
 
 	//*****************************************************
 	//	MAIN LOOP
@@ -850,7 +850,7 @@ int main()
 		// Drawing
 		// Instruct OpenGL to use our shader program and our VAO
 		glUseProgram(shaders.at(shaderSelector)->getId());
-		glBindTexture(GL_TEXTURE_2D, modelTextures.at(modelSelector)->GetId());
+		glBindTexture(GL_TEXTURE_2D, textures.at(modelSelector)->GetId());
 		glBindVertexArray(models.at(modelSelector)->getId());
 
 		//*****************************************************
