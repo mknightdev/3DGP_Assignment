@@ -49,8 +49,6 @@ bool intersect(glm::vec2 mouse, glm::vec4 rectangle)
 	return true;
 }
 
-
-
 int main()
 {
 	//*****************************************************
@@ -75,10 +73,6 @@ int main()
 	//	CREATE BUFFER ARRAY
 	//*****************************************************
 
-	// Same thing as: 
-	// VertexBuffer* positionsVbo = new VertexBuffer();
-	//
-	// Automatically deletes 
 	// Created positionsVBO
 	std::shared_ptr<VertexBuffer> positionsVbo = std::make_shared<VertexBuffer>();
 
@@ -146,7 +140,7 @@ int main()
 	//*****************************************************
 	//	[VERT SHADER] SPECULAR LIGHTING
 	//*****************************************************
-	const GLchar* vertexShaderSrc =
+	const GLchar* vertShaderSpecular =
 		"attribute vec3 a_Position;														" \
 		"attribute vec2 a_TexCoord;														" \
 		"attribute vec3 a_Normal;														" \
@@ -171,13 +165,12 @@ int main()
 	//*****************************************************
 	//	[FRAG SHADER] SPECULAR LIGHTING
 	//*****************************************************
-	const GLchar* fragmentShaderSrc =
+	const GLchar* fragShaderSpecular =
 		"#version 410\n													" \
 		"uniform sampler2D u_Texture;									" \
 		"varying vec2 v_TexCoord;										" \
 		"varying vec3 v_FragPos;										" \
 		"varying vec3 v_Normal;											" \
-		"uniform float u_Pulse;											" \
 		"uniform mat4 u_View;											" \
 		"uniform mat4 u_InverseView;									" \
 		"																" \
@@ -199,50 +192,16 @@ int main()
 		" vec3 specular = spec * vec3(1, 1, 1); 						" \
 		" 																" \
 		"																" \
-		" gl_FragColor = vec4(diffuse + specular, 1.0) * tex;					" \
+		" gl_FragColor = vec4(diffuse + specular, 1.0) * tex;			" \
 		"}																";
 
-	//*****************************************************
-	//	FRAGMENT SHADER DEBUGGING & Notes
-	//	- " vec4 tex = texture2D(u_Texture, v_TexCoord); " \
-	//	- " vec4 tex = vec4(v_TexCoord, 0, 1);	" \
-	//  Note:
-	//	For diffuse, set "gl_FragColor = vec4(diffuse, 1);"
-	//	For ambient, set "gl_FragColor = vec4(light, 1) * tex;"
-	//	For specular, set "gl_FragColor = vec4(diffuse + specular, 1.0);"
-	//	For shininess, 32 is good. 8 makes it look metallic.
-	//
-	//	Diffuse:
-	//	" vec3 lightPos = vec3(10, 10, 0);					" \
-	//	" vec3 norm = normalize(v_Normal);					" \
-	//	" vec3 lightDir = normalize(lightPos - v_FragPos);	" \
-	//	"													" \
-	//	" float diff = max(dot(norm, lightDir), 0.0);		" \
-	//	" vec3 diffuse = vec3(1, 1, 1) * diff;				" \
-	//	
-	//	Ambient:
-	//	" float ambientStrength = 0.1;						" \
-	//	" vec3 lightColour(0, 1, 0);						" \
-	//	"													" \
-	//	" vec3 ambient = ambientStrength * lightColour;		" \
-	//	" vec3 light = ambient;								" \
-	//
-	//	Specular:
-	//	" vec3 viewPos = vec3(0, 0, 15);								" \
-	//	" vec3 viewDir = normalize(viewPos - v_FragPos);				" \
-	//	" vec3 reflectDir = reflect(-lightDir, norm);					" \
-	//	" float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);	" \
-	//	" vec3 specular = spec * vec3(1, 1, 1); 						" \
-	//
-	//*****************************************************
-
-	std::shared_ptr<ShaderProgram> shaderProgram = std::make_shared<ShaderProgram>();
-	shaderProgram->CreateShader(vertexShaderSrc, fragmentShaderSrc);
+	std::shared_ptr<ShaderProgram> shaderSpecular = std::make_shared<ShaderProgram>();
+	shaderSpecular->CreateShader(vertShaderSpecular, fragShaderSpecular);
 
 	//*****************************************************
 	//	[VERT SHADER] DIFFUSE LIGHTING
 	//*****************************************************
-	const GLchar* vertexShaderSrc2 =
+	const GLchar* vertShaderDiffuse =
 		"attribute vec3 a_Position;														" \
 		"attribute vec2 a_TexCoord;														" \
 		"attribute vec3 a_Normal;														" \
@@ -267,13 +226,12 @@ int main()
 	//*****************************************************
 	//	[FRAG SHADER] DIFFUSE LIGHTING
 	//*****************************************************
-	const GLchar* fragmentShaderSrc2 =
+	const GLchar* fragShaderDiffuse =
 		"#version 410\n													" \
 		"uniform sampler2D u_Texture;									" \
 		"varying vec2 v_TexCoord;										" \
 		"varying vec3 v_FragPos;										" \
 		"varying vec3 v_Normal;											" \
-		"uniform float u_Pulse;											" \
 		"uniform mat4 u_View;											" \
 		"																" \
 		"void main()													" \
@@ -289,16 +247,70 @@ int main()
 		"																" \
 		" 																" \
 		"																" \
-		" gl_FragColor = vec4(diffuse, 1.0) * tex;							" \
+		" gl_FragColor = vec4(diffuse, 1.0) * tex;						" \
 		"}																";
 
-	std::shared_ptr<ShaderProgram> shaderProgram2 = std::make_shared<ShaderProgram>();
-	shaderProgram2->CreateShader(vertexShaderSrc2, fragmentShaderSrc2);
+	std::shared_ptr<ShaderProgram> shaderDiffuse = std::make_shared<ShaderProgram>();
+	shaderDiffuse->CreateShader(vertShaderDiffuse, fragShaderDiffuse);
+
+	//*****************************************************
+	//	[VERT SHADER] AMBIENT LIGHTING
+	//*****************************************************
+	const GLchar* vertShaderAmbient =
+		"attribute vec3 a_Position;														" \
+		"attribute vec2 a_TexCoord;														" \
+		"attribute vec3 a_Normal;														" \
+		"uniform mat4 u_Projection;														" \
+		"uniform mat4 u_Model;															" \
+		"uniform mat4 u_View;															" \
+		"																				" \
+		"																				" \
+		"varying vec2 v_TexCoord;														" \
+		"varying vec3 v_FragPos;														" \
+		"varying vec3 v_Normal;															" \
+		"																				" \
+		"void main()																	" \
+		"{																				" \
+		" v_FragPos = vec3(u_Model * vec4(a_Position, 1.0));							" \
+		" gl_Position = u_Projection * u_View * u_Model * vec4(a_Position, 1.0);		" \
+		" v_TexCoord = a_TexCoord;														" \
+		" v_Normal = vec3(u_Model * vec4(a_Normal, 0));									" \
+		"}																				" \
+		"																				";
+
+	//*****************************************************
+	//	[FRAG SHADER] AMBIENT LIGHTING
+	//*****************************************************
+	const GLchar* fragShaderAmbient =
+		"uniform sampler2D u_Texture;									" \
+		"varying vec2 v_TexCoord;										" \
+		"varying vec3 v_FragPos;										" \
+		"varying vec3 v_Normal;											" \
+		"uniform mat4 u_View;											" \
+		"																" \
+		"void main()													" \
+		"{																" \
+		" vec4 tex = texture2D(u_Texture, v_TexCoord);					" \
+		"																" \
+		" vec3 lightPos = vec3(10, 10, 0);								" \
+		" vec3 norm = normalize(v_Normal);								" \
+		" vec3 lightDir = normalize(lightPos - v_FragPos);				" \
+		"																" \
+		" float diff = max(dot(norm, lightDir), 0.0);					" \
+		" vec3 diffuse = vec3(1, 0, 0) * diff;							" \
+		" float ambient = 0.20f;										" \
+		" 																" \
+		"																" \
+		" gl_FragColor = vec4((diffuse + ambient), 1.0) * tex;			" \
+		"}																";
+
+	std::shared_ptr<ShaderProgram> shaderAmbient = std::make_shared<ShaderProgram>();
+	shaderAmbient->CreateShader(vertShaderAmbient, fragShaderAmbient);
 
 	//*****************************************************
 	//	[VERT SHADER] TEXTURE ONLY
 	//*****************************************************
-	const GLchar* vertexShaderSrc3 =
+	const GLchar* vertShaderNoLight =
 		"attribute vec3 a_Position;														" \
 		"attribute vec2 a_TexCoord;														" \
 		"uniform mat4 u_Projection;														" \
@@ -318,10 +330,9 @@ int main()
 	//*****************************************************
 	//	[FRAG SHADER] TEXTURE ONLY
 	//*****************************************************
-	const GLchar* fragmentShaderSrc3 =
+	const GLchar* fragShaderNoLight =
 		"uniform sampler2D u_Texture;									" \
 		"varying vec2 v_TexCoord;										" \
-		"uniform float u_Pulse;											" \
 		"																" \
 		"void main()													" \
 		"{																" \
@@ -329,13 +340,13 @@ int main()
 		" gl_FragColor = tex;											" \
 		"}																";
 
-	std::shared_ptr<ShaderProgram> shaderProgram3 = std::make_shared<ShaderProgram>();
-	shaderProgram3->CreateShader(vertexShaderSrc3, fragmentShaderSrc3);
+	std::shared_ptr<ShaderProgram> shaderNoLight = std::make_shared<ShaderProgram>();
+	shaderNoLight->CreateShader(vertShaderNoLight, fragShaderNoLight);
 
 	//*****************************************************
 	//	CREATE UI VERTEX SHADER 
 	//*****************************************************
-	const GLchar* vertexShaderSrcUI =
+	const GLchar* vertShaderUI =
 		"attribute vec3 a_Position;														" \
 		"attribute vec2 a_TexCoord;														" \
 		"uniform mat4 u_Projection;														" \
@@ -354,7 +365,7 @@ int main()
 	//*****************************************************
 	//	CREATE UI FRAGMENT SHADER 
 	//*****************************************************
-	const GLchar* fragmentShaderSrcUI =
+	const GLchar* fragShaderUI =
 		"uniform sampler2D u_Texture;									" \
 		"varying vec2 v_TexCoord;										" \
 		"																" \
@@ -364,104 +375,108 @@ int main()
 		" gl_FragColor = tex;											" \
 		"}																";
 
-	std::shared_ptr<ShaderProgram> shaderProgramUI = std::make_shared<ShaderProgram>();
-	shaderProgramUI->CreateShader(vertexShaderSrcUI, fragmentShaderSrcUI);
+	std::shared_ptr<ShaderProgram> shaderUI = std::make_shared<ShaderProgram>();
+	shaderUI->CreateShader(vertShaderUI, fragShaderUI);
 
 	//******************************
 	//	Group Perspective Shaders
 	//******************************
-	// Vector of Shaders
 	std::vector<std::shared_ptr<ShaderProgram>> shaders;
 
-	shaders.push_back(shaderProgram);
-	shaders.push_back(shaderProgram2);
-	shaders.push_back(shaderProgram3);
-
-	//*****************************************************
-	//	OBTAIN UNIFORM LOCATION
-	//*****************************************************
-	GLint pulseLoc = glGetUniformLocation(shaderProgram->getId(), "u_Pulse");
-
-	if (pulseLoc == -1)
-	{
-		//throw std::exception();
-	}
-
-	// Find uniform locations
-	GLint modelLoc = glGetUniformLocation(shaderProgram->getId(), "u_Model");
-	GLint projectionLoc = glGetUniformLocation(shaderProgram->getId(), "u_Projection");
-	GLint viewLoc = glGetUniformLocation(shaderProgram->getId(), "u_View");
-	GLint inverseViewLoc = glGetUniformLocation(shaderProgram->getId(), "u_InverseView");
-
-	if (modelLoc == -1)
-	{
-		throw std::exception();
-	}
-	if (projectionLoc == -1)
-	{
-		throw std::exception();
-	}
-	if (viewLoc == -1)
-	{
-		throw std::exception();
-	}
-	if (inverseViewLoc == -1)
-	{
-		throw std::exception();
-	}
-
-	//*****************************************************
-	//	OBTAIN UNIFORM LOCATION 2
-	//*****************************************************
-	GLint pulseLoc2 = glGetUniformLocation(shaderProgram2->getId(), "u_Pulse");
-
-	if (pulseLoc2 == -1)
-	{
-		//throw std::exception();
-	}
-
-	// Find uniform locations
-	GLint modelLoc2 = glGetUniformLocation(shaderProgram2->getId(), "u_Model");
-	GLint projectionLoc2 = glGetUniformLocation(shaderProgram2->getId(), "u_Projection");
-	GLint viewLoc2 = glGetUniformLocation(shaderProgram2->getId(), "u_View");
-
-	if (modelLoc2 == -1)
-	{
-		throw std::exception();
-	}
-	if (projectionLoc2 == -1)
-	{
-		throw std::exception();
-	}
-	if (viewLoc2 == -1)
-	{
-		throw std::exception();
-	}
+	shaders.push_back(shaderNoLight);
+	shaders.push_back(shaderDiffuse);
+	shaders.push_back(shaderAmbient);
+	shaders.push_back(shaderSpecular);
 
 	//*****************************************************
 	//	OBTAIN UNIFORM LOCATION 3
 	//*****************************************************
-	GLint pulseLoc3 = glGetUniformLocation(shaderProgram3->getId(), "u_Pulse");
-
-	if (pulseLoc3 == -1)
-	{
-		//throw std::exception();
-	}
 
 	// Find uniform locations
-	GLint modelLoc3 = glGetUniformLocation(shaderProgram3->getId(), "u_Model");
-	GLint projectionLoc3 = glGetUniformLocation(shaderProgram3->getId(), "u_Projection");
-	GLint viewLoc3 = glGetUniformLocation(shaderProgram3->getId(), "u_View");
+	GLint modelLocNoLight = glGetUniformLocation(shaderNoLight->getId(), "u_Model");
+	GLint projectionLocNoLight = glGetUniformLocation(shaderNoLight->getId(), "u_Projection");
+	GLint viewLocNoLight = glGetUniformLocation(shaderNoLight->getId(), "u_View");
 
-	if (modelLoc3 == -1)
+	if (modelLocNoLight == -1)
 	{
 		throw std::exception();
 	}
-	if (projectionLoc3 == -1)
+	if (projectionLocNoLight == -1)
 	{
 		throw std::exception();
 	}
-	if (viewLoc3 == -1)
+	if (viewLocNoLight == -1)
+	{
+		throw std::exception();
+	}
+
+	//*****************************************************
+	//	OBTAIN DIFFUSE UNIFORM LOCATION
+	//*****************************************************
+
+	// Find uniform locations
+	GLint modelLocDiffuse = glGetUniformLocation(shaderDiffuse->getId(), "u_Model");
+	GLint projectionLocDiffuse = glGetUniformLocation(shaderDiffuse->getId(), "u_Projection");
+	GLint viewLocDiffuse = glGetUniformLocation(shaderDiffuse->getId(), "u_View");
+
+	if (modelLocDiffuse == -1)
+	{
+		throw std::exception();
+	}
+	if (projectionLocDiffuse == -1)
+	{
+		throw std::exception();
+	}
+	if (viewLocDiffuse == -1)
+	{
+		throw std::exception();
+	}
+
+	//*****************************************************
+	//	OBTAIN AMBIENT UNIFORM LOCATION
+	//*****************************************************
+
+	// Find uniform locations
+	GLint modelLocAmbient = glGetUniformLocation(shaderAmbient->getId(), "u_Model");
+	GLint projectionLocAmbient = glGetUniformLocation(shaderAmbient->getId(), "u_Projection");
+	GLint viewLocAmbient = glGetUniformLocation(shaderAmbient->getId(), "u_View");
+
+	if (modelLocAmbient == -1)
+	{
+		throw std::exception();
+	}
+	if (projectionLocAmbient == -1)
+	{
+		throw std::exception();
+	}
+	if (viewLocAmbient == -1)
+	{
+		throw std::exception();
+	}
+
+	//*****************************************************
+	//	OBTAIN SPECULAR UNIFORM LOCATION
+	//*****************************************************
+
+	// Find uniform locations
+	GLint modelLocSpecular = glGetUniformLocation(shaderSpecular->getId(), "u_Model");
+	GLint projectionLocSpecular = glGetUniformLocation(shaderSpecular->getId(), "u_Projection");
+	GLint viewLocSpecular = glGetUniformLocation(shaderSpecular->getId(), "u_View");
+	GLint inverseViewLocSpecular = glGetUniformLocation(shaderSpecular->getId(), "u_InverseView");
+
+	if (modelLocSpecular == -1)
+	{
+		throw std::exception();
+	}
+	if (projectionLocSpecular == -1)
+	{
+		throw std::exception();
+	}
+	if (viewLocSpecular == -1)
+	{
+		throw std::exception();
+	}
+	if (inverseViewLocSpecular == -1)
 	{
 		throw std::exception();
 	}
@@ -469,16 +484,10 @@ int main()
 	//*****************************************************
 	//	OBTAIN UI UNIFORM LOCATION 
 	//*****************************************************
-	GLint pulseLocUI = glGetUniformLocation(shaderProgramUI->getId(), "u_Pulse");
-
-	if (pulseLocUI == -1)
-	{
-		//throw std::exception();
-	}
 
 	// Find uniform locations
-	GLint modelLocUI = glGetUniformLocation(shaderProgramUI->getId(), "u_Model");
-	GLint projectionLocUI = glGetUniformLocation(shaderProgramUI->getId(), "u_Projection");
+	GLint modelLocUI = glGetUniformLocation(shaderUI->getId(), "u_Model");
+	GLint projectionLocUI = glGetUniformLocation(shaderUI->getId(), "u_Projection");
 
 	if (modelLocUI == -1)
 	{
@@ -491,31 +500,30 @@ int main()
 
 
 	// VECTORS
-	std::vector<GLint> pulseLocs;
 	std::vector<GLint> modelLocs;
 	std::vector<GLint> projectionLocs;
 	std::vector<GLint> viewLocs;
 	std::vector<GLint> inverseViewLocs;
 
-	pulseLocs.push_back(pulseLoc);
-	pulseLocs.push_back(pulseLoc2);
-	pulseLocs.push_back(pulseLoc3);
+	modelLocs.push_back(modelLocNoLight);
+	modelLocs.push_back(modelLocDiffuse);
+	modelLocs.push_back(modelLocAmbient);
+	modelLocs.push_back(modelLocSpecular);
 
-	modelLocs.push_back(modelLoc);
-	modelLocs.push_back(modelLoc2);
-	modelLocs.push_back(modelLoc3);
+	projectionLocs.push_back(projectionLocNoLight);
+	projectionLocs.push_back(projectionLocDiffuse);
+	projectionLocs.push_back(projectionLocAmbient);
+	projectionLocs.push_back(projectionLocSpecular);
 
-	projectionLocs.push_back(projectionLoc);
-	projectionLocs.push_back(projectionLoc2);
-	projectionLocs.push_back(projectionLoc3);
+	viewLocs.push_back(viewLocNoLight);
+	viewLocs.push_back(viewLocDiffuse);
+	viewLocs.push_back(viewLocAmbient);
+	viewLocs.push_back(viewLocSpecular);
 
-	viewLocs.push_back(viewLoc);
-	viewLocs.push_back(viewLoc2);
-	viewLocs.push_back(viewLoc3);
-
-	inverseViewLocs.push_back(inverseViewLoc);
 	inverseViewLocs.push_back(-1);
 	inverseViewLocs.push_back(-1);
+	inverseViewLocs.push_back(-1);
+	inverseViewLocs.push_back(inverseViewLocSpecular);
 
 	//*****************************************************
 	//	[IMAGE] MODEL TEXTURES
@@ -572,7 +580,6 @@ int main()
 	//	MAIN LOOP
 	//*****************************************************
 	bool stopped = false;
-	float pulse = 0;
 
 	float angle = 0;
 	float xPos = 0;
@@ -753,19 +760,6 @@ int main()
 		// Makes sure it has the latest prev time. Otherwise it will make things go faster and faster
 		prevTime = currTime;
 
-		pulse += 1.0f;
-		if (pulse > 1)
-		{
-			pulse = 0;
-		}
-
-		// Update
-		if (intersect(mouse, glm::vec4(50, 50, 100, 100)) && mouseButtonDown)
-		{
-			std::cout << "Texture intersect True" << std::endl;
-			mouseButtonDown = false;
-		}
-
 		// Shader Left Arrow
 		if (intersect(mouse, glm::vec4(width - 300, 450, 100, 100)) && mouseButtonDown)
 		{
@@ -853,13 +847,13 @@ int main()
 		}
 
 		// Rotate Icon 
-		if (intersect(mouse, glm::vec4(50, 125, 100, 100)) && mouseButtonDown && !rotateOn)
+		if (intersect(mouse, glm::vec4(75, 155, 50, 50)) && mouseButtonDown && !rotateOn)
 		{
 			rotateOn = true;
 			std::cout << "Rotate intersect True" << std::endl;
 			mouseButtonDown = false;
 		}
-		else if (intersect(mouse, glm::vec4(50, 125, 100, 100)) && mouseButtonDown && rotateOn)
+		else if (intersect(mouse, glm::vec4(75, 155, 50, 50)) && mouseButtonDown && rotateOn)
 		{
 			rotateOn = false;
 			std::cout << "Rotate intersect True" << std::endl;
@@ -880,8 +874,6 @@ int main()
 		//glBindTexture(GL_TEXTURE_2D, data->GetId());
 		glBindTexture(GL_TEXTURE_2D, modelTextures.at(modelSelector)->GetId());
 		glBindVertexArray(models.at(modelSelector)->getId());
-
-		//glUniform1f(pulseLocs.at(shaderSelector), pulse);
 
 		//*****************************************************
 		//	PERSPECTIVE PATH
@@ -953,7 +945,7 @@ int main()
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		glBindVertexArray(vao->getId());
-		glUseProgram(shaderProgramUI->getId());
+		glUseProgram(shaderUI->getId());
 
 		// Prepare the orthographic projection matrix (reusing the variable)
 		projection = glm::ortho(0.0f, (float)width, 0.0f,
@@ -1050,8 +1042,8 @@ int main()
 			rotateIcon->Bind(rotateIconTexture->GetId(), vao->getId());
 		}
 
-		rotateIcon->SetPosition(100, height - 175, 0);
-		rotateIcon->SetScale(40, 40, 1);
+		rotateIcon->SetPosition(100, height - 180, 0);
+		rotateIcon->SetScale(50, 50, 1);
 		rotateIcon->Draw(modelLocUI, projectionLocUI, projection, vao->getVertCount());
 
 		//*****************************************************
