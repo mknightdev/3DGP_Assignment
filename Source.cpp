@@ -1063,6 +1063,5 @@ int main()
 		glViewport(0, 0, width, height);
 		SDL_GL_SwapWindow(window);
 	}
-
 	return 0;
 }
