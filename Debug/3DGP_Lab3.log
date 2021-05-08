@@ -1,11 +1,3 @@
-﻿  Model.cpp
-  ShaderProgram.cpp
-  Source.cpp
-F:\Programming\Repos\3DGP_Lab3\3DGP_Lab3\src\Source.cpp(738,18): warning C4244: 'initializing': conversion from 'Uint32' to 'float', possible loss of data
-  Texture.cpp
-  VertexArray.cpp
-F:\Programming\Repos\3DGP_Lab3\3DGP_Lab3\include\bugl.h(327,25): warning C4101: 'e': unreferenced local variable
-F:\Programming\Repos\3DGP_Lab3\3DGP_Lab3\src\VertexArray.cpp(8): message : see reference to function template instantiation 'GLuint bu::loadModel<int>(const std::string &,size_t *)' being compiled
-  VertexBuffer.cpp
-  Generating Code...
+﻿  Source.cpp
+F:\Programming\Repos\3DGP_Lab3\3DGP_Lab3\src\Source.cpp(795,18): warning C4244: 'initializing': conversion from 'Uint32' to 'float', possible loss of data
   3DGP_Lab3.vcxproj -> F:\Programming\Repos\3DGP_Lab3\Debug\3DGP_Lab3.exe

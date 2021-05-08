@@ -3,7 +3,6 @@
 
 const GLsizei LOG_LENGTH = 512;
 
-
 struct ShaderProgram
 {
 public:
