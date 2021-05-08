@@ -6,12 +6,10 @@
 #include "Texture.h"
 #include "Model.h"
 
-/* Lab 4 - Start*/
 // Needs to be defined before the include in exactly
 // one compilation unit.
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-/* Lab 4 - End */
 
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
@@ -108,25 +106,9 @@ int main()
 	vao->setBuffer(1, texturesVbo);
 
 	//*****************************************************
-	//	READ IN FROM FILE
+	//	OBTAIN OBJECTS
 	//*****************************************************
 
-	// Model destination
-	std::string modelSettings;
-
-	// Model settings
-	std::ifstream readFile("Model_Settings.txt");
-
-	while (readFile >> modelSettings)
-	{
-		std::cout << modelSettings << std::endl;
-	}
-
-	// Close the file, as it's no longer needed. 
-	readFile.close();
-
-	// path is the file location
-	//std::shared_ptr<VertexArray> cat = std::make_shared<VertexArray>(modelSettings);
 	std::shared_ptr<VertexArray> catVA = std::make_shared<VertexArray>("models/curuthers/curuthers.obj");
 	std::shared_ptr<VertexArray> skeletonVA = std::make_shared<VertexArray>("models/skeleton/skeleton.obj");
 	std::shared_ptr<VertexArray> crocVA = std::make_shared<VertexArray>("models/croc/croc.obj");
@@ -141,26 +123,26 @@ int main()
 	//	[VERT SHADER] SPECULAR LIGHTING
 	//*****************************************************
 	const GLchar* vertShaderSpecular =
-		"attribute vec3 a_Position;														" \
-		"attribute vec2 a_TexCoord;														" \
-		"attribute vec3 a_Normal;														" \
-		"uniform mat4 u_Projection;														" \
-		"uniform mat4 u_Model;															" \
-		"uniform mat4 u_View;															" \
-		"																				" \
-		"																				" \
-		"varying vec2 v_TexCoord;														" \
-		"varying vec3 v_FragPos;														" \
-		"varying vec3 v_Normal;															" \
-		"																				" \
-		"void main()																	" \
-		"{																				" \
-		" v_FragPos = vec3(u_Model * vec4(a_Position, 1.0));							" \
-		" gl_Position = u_Projection * u_View * u_Model * vec4(a_Position, 1.0);		" \
-		" v_TexCoord = a_TexCoord;														" \
-		" v_Normal = vec3(u_Model * vec4(a_Normal, 0));									" \
-		"}																				" \
-		"																				";
+		"attribute vec3 a_Position;													" \
+		"attribute vec2 a_TexCoord;													" \
+		"attribute vec3 a_Normal;													" \
+		"uniform mat4 u_Projection;													" \
+		"uniform mat4 u_Model;														" \
+		"uniform mat4 u_View;														" \
+		"																			" \
+		"																			" \
+		"varying vec2 v_TexCoord;													" \
+		"varying vec3 v_FragPos;													" \
+		"varying vec3 v_Normal;														" \
+		"																			" \
+		"void main()																" \
+		"{																			" \
+		" v_FragPos = vec3(u_Model * vec4(a_Position, 1.0));						" \
+		" gl_Position = u_Projection * u_View * u_Model * vec4(a_Position, 1.0);	" \
+		" v_TexCoord = a_TexCoord;													" \
+		" v_Normal = vec3(u_Model * vec4(a_Normal, 0));								" \
+		"}																			" \
+		"																			";
 
 	//*****************************************************
 	//	[FRAG SHADER] SPECULAR LIGHTING
@@ -202,53 +184,53 @@ int main()
 	//	[VERT SHADER] DIFFUSE LIGHTING
 	//*****************************************************
 	const GLchar* vertShaderDiffuse =
-		"attribute vec3 a_Position;														" \
-		"attribute vec2 a_TexCoord;														" \
-		"attribute vec3 a_Normal;														" \
-		"uniform mat4 u_Projection;														" \
-		"uniform mat4 u_Model;															" \
-		"uniform mat4 u_View;															" \
-		"																				" \
-		"																				" \
-		"varying vec2 v_TexCoord;														" \
-		"varying vec3 v_FragPos;														" \
-		"varying vec3 v_Normal;															" \
-		"																				" \
-		"void main()																	" \
-		"{																				" \
-		" v_FragPos = vec3(u_Model * vec4(a_Position, 1.0));							" \
-		" gl_Position = u_Projection * u_View * u_Model * vec4(a_Position, 1.0);		" \
-		" v_TexCoord = a_TexCoord;														" \
-		" v_Normal = vec3(u_Model * vec4(a_Normal, 0));									" \
-		"}																				" \
-		"																				";
+		"attribute vec3 a_Position;													" \
+		"attribute vec2 a_TexCoord;													" \
+		"attribute vec3 a_Normal;													" \
+		"uniform mat4 u_Projection;													" \
+		"uniform mat4 u_Model;														" \
+		"uniform mat4 u_View;														" \
+		"																			" \
+		"																			" \
+		"varying vec2 v_TexCoord;													" \
+		"varying vec3 v_FragPos;													" \
+		"varying vec3 v_Normal;														" \
+		"																			" \
+		"void main()																" \
+		"{																			" \
+		" v_FragPos = vec3(u_Model * vec4(a_Position, 1.0));						" \
+		" gl_Position = u_Projection * u_View * u_Model * vec4(a_Position, 1.0);	" \
+		" v_TexCoord = a_TexCoord;													" \
+		" v_Normal = vec3(u_Model * vec4(a_Normal, 0));								" \
+		"}																			" \
+		"																			";
 
 	//*****************************************************
 	//	[FRAG SHADER] DIFFUSE LIGHTING
 	//*****************************************************
 	const GLchar* fragShaderDiffuse =
-		"#version 410\n													" \
-		"uniform sampler2D u_Texture;									" \
-		"varying vec2 v_TexCoord;										" \
-		"varying vec3 v_FragPos;										" \
-		"varying vec3 v_Normal;											" \
-		"uniform mat4 u_View;											" \
-		"																" \
-		"void main()													" \
-		"{																" \
-		" vec4 tex = texture2D(u_Texture, v_TexCoord);					" \
-		"																" \
-		" vec3 lightPos = vec3(10, 10, 0);								" \
-		" vec3 norm = normalize(v_Normal);								" \
-		" vec3 lightDir = normalize(lightPos - v_FragPos);				" \
-		"																" \
-		" float diff = max(dot(norm, lightDir), 0.0);					" \
-		" vec3 diffuse = vec3(1, 1, 0) * diff;							" \
-		"																" \
-		" 																" \
-		"																" \
-		" gl_FragColor = vec4(diffuse, 1.0) * tex;						" \
-		"}																";
+		"#version 410\n										" \
+		"uniform sampler2D u_Texture;						" \
+		"varying vec2 v_TexCoord;							" \
+		"varying vec3 v_FragPos;							" \
+		"varying vec3 v_Normal;								" \
+		"uniform mat4 u_View;								" \
+		"													" \
+		"void main()										" \
+		"{													" \
+		" vec4 tex = texture2D(u_Texture, v_TexCoord);		" \
+		"													" \
+		" vec3 lightPos = vec3(10, 10, 0);					" \
+		" vec3 norm = normalize(v_Normal);					" \
+		" vec3 lightDir = normalize(lightPos - v_FragPos);	" \
+		"													" \
+		" float diff = max(dot(norm, lightDir), 0.0);		" \
+		" vec3 diffuse = vec3(1, 1, 0) * diff;				" \
+		"													" \
+		" 													" \
+		"													" \
+		" gl_FragColor = vec4(diffuse, 1.0) * tex;			" \
+		"}													";
 
 	std::shared_ptr<ShaderProgram> shaderDiffuse = std::make_shared<ShaderProgram>();
 	shaderDiffuse->CreateShader(vertShaderDiffuse, fragShaderDiffuse);
@@ -257,52 +239,52 @@ int main()
 	//	[VERT SHADER] AMBIENT LIGHTING
 	//*****************************************************
 	const GLchar* vertShaderAmbient =
-		"attribute vec3 a_Position;														" \
-		"attribute vec2 a_TexCoord;														" \
-		"attribute vec3 a_Normal;														" \
-		"uniform mat4 u_Projection;														" \
-		"uniform mat4 u_Model;															" \
-		"uniform mat4 u_View;															" \
-		"																				" \
-		"																				" \
-		"varying vec2 v_TexCoord;														" \
-		"varying vec3 v_FragPos;														" \
-		"varying vec3 v_Normal;															" \
-		"																				" \
-		"void main()																	" \
-		"{																				" \
-		" v_FragPos = vec3(u_Model * vec4(a_Position, 1.0));							" \
-		" gl_Position = u_Projection * u_View * u_Model * vec4(a_Position, 1.0);		" \
-		" v_TexCoord = a_TexCoord;														" \
-		" v_Normal = vec3(u_Model * vec4(a_Normal, 0));									" \
-		"}																				" \
-		"																				";
+		"attribute vec3 a_Position;													" \
+		"attribute vec2 a_TexCoord;													" \
+		"attribute vec3 a_Normal;													" \
+		"uniform mat4 u_Projection;													" \
+		"uniform mat4 u_Model;														" \
+		"uniform mat4 u_View;														" \
+		"																			" \
+		"																			" \
+		"varying vec2 v_TexCoord;													" \
+		"varying vec3 v_FragPos;													" \
+		"varying vec3 v_Normal;														" \
+		"																			" \
+		"void main()																" \
+		"{																			" \
+		" v_FragPos = vec3(u_Model * vec4(a_Position, 1.0));						" \
+		" gl_Position = u_Projection * u_View * u_Model * vec4(a_Position, 1.0);	" \
+		" v_TexCoord = a_TexCoord;													" \
+		" v_Normal = vec3(u_Model * vec4(a_Normal, 0));								" \
+		"}																			" \
+		"																			";
 
 	//*****************************************************
 	//	[FRAG SHADER] AMBIENT LIGHTING
 	//*****************************************************
 	const GLchar* fragShaderAmbient =
-		"uniform sampler2D u_Texture;									" \
-		"varying vec2 v_TexCoord;										" \
-		"varying vec3 v_FragPos;										" \
-		"varying vec3 v_Normal;											" \
-		"uniform mat4 u_View;											" \
-		"																" \
-		"void main()													" \
-		"{																" \
-		" vec4 tex = texture2D(u_Texture, v_TexCoord);					" \
-		"																" \
-		" vec3 lightPos = vec3(10, 10, 0);								" \
-		" vec3 norm = normalize(v_Normal);								" \
-		" vec3 lightDir = normalize(lightPos - v_FragPos);				" \
-		"																" \
-		" float diff = max(dot(norm, lightDir), 0.0);					" \
-		" vec3 diffuse = vec3(1, 0, 0) * diff;							" \
-		" float ambient = 0.20f;										" \
-		" 																" \
-		"																" \
-		" gl_FragColor = vec4((diffuse + ambient), 1.0) * tex;			" \
-		"}																";
+		"uniform sampler2D u_Texture;							" \
+		"varying vec2 v_TexCoord;								" \
+		"varying vec3 v_FragPos;								" \
+		"varying vec3 v_Normal;									" \
+		"uniform mat4 u_View;									" \
+		"														" \
+		"void main()											" \
+		"{														" \
+		" vec4 tex = texture2D(u_Texture, v_TexCoord);			" \
+		"														" \
+		" vec3 lightPos = vec3(10, 10, 0);						" \
+		" vec3 norm = normalize(v_Normal);						" \
+		" vec3 lightDir = normalize(lightPos - v_FragPos);		" \
+		"														" \
+		" float diff = max(dot(norm, lightDir), 0.0);			" \
+		" vec3 diffuse = vec3(1, 0, 0) * diff;					" \
+		" float ambient = 0.20f;								" \
+		" 														" \
+		"														" \
+		" gl_FragColor = vec4((diffuse + ambient), 1.0) * tex;	" \
+		"}														";
 
 	std::shared_ptr<ShaderProgram> shaderAmbient = std::make_shared<ShaderProgram>();
 	shaderAmbient->CreateShader(vertShaderAmbient, fragShaderAmbient);
@@ -311,34 +293,34 @@ int main()
 	//	[VERT SHADER] TEXTURE ONLY
 	//*****************************************************
 	const GLchar* vertShaderNoLight =
-		"attribute vec3 a_Position;														" \
-		"attribute vec2 a_TexCoord;														" \
-		"uniform mat4 u_Projection;														" \
-		"uniform mat4 u_Model;															" \
-		"uniform mat4 u_View;															" \
-		"																				" \
-		"																				" \
-		"varying vec2 v_TexCoord;														" \
-		"																				" \
-		"void main()																	" \
-		"{																				" \
-		" gl_Position = u_Projection * u_View * u_Model * vec4(a_Position, 1.0);		" \
-		" v_TexCoord = a_TexCoord;														" \
-		"}																				" \
-		"																				";
+		"attribute vec3 a_Position;													" \
+		"attribute vec2 a_TexCoord;													" \
+		"uniform mat4 u_Projection;													" \
+		"uniform mat4 u_Model;														" \
+		"uniform mat4 u_View;														" \
+		"																			" \
+		"																			" \
+		"varying vec2 v_TexCoord;													" \
+		"																			" \
+		"void main()																" \
+		"{																			" \
+		" gl_Position = u_Projection * u_View * u_Model * vec4(a_Position, 1.0);	" \
+		" v_TexCoord = a_TexCoord;													" \
+		"}																			" \
+		"																			";
 
 	//*****************************************************
 	//	[FRAG SHADER] TEXTURE ONLY
 	//*****************************************************
 	const GLchar* fragShaderNoLight =
-		"uniform sampler2D u_Texture;									" \
-		"varying vec2 v_TexCoord;										" \
-		"																" \
-		"void main()													" \
-		"{																" \
-		" vec4 tex = texture2D(u_Texture, v_TexCoord);					" \
-		" gl_FragColor = tex;											" \
-		"}																";
+		"uniform sampler2D u_Texture;					" \
+		"varying vec2 v_TexCoord;						" \
+		"												" \
+		"void main()									" \
+		"{												" \
+		" vec4 tex = texture2D(u_Texture, v_TexCoord);	" \
+		" gl_FragColor = tex;							" \
+		"}												";
 
 	std::shared_ptr<ShaderProgram> shaderNoLight = std::make_shared<ShaderProgram>();
 	shaderNoLight->CreateShader(vertShaderNoLight, fragShaderNoLight);
@@ -347,33 +329,33 @@ int main()
 	//	CREATE UI VERTEX SHADER 
 	//*****************************************************
 	const GLchar* vertShaderUI =
-		"attribute vec3 a_Position;														" \
-		"attribute vec2 a_TexCoord;														" \
-		"uniform mat4 u_Projection;														" \
-		"uniform mat4 u_Model;															" \
-		"																				" \
-		"																				" \
-		"varying vec2 v_TexCoord;														" \
-		"																				" \
-		"void main()																	" \
-		"{																				" \
+		"attribute vec3 a_Position;											" \
+		"attribute vec2 a_TexCoord;											" \
+		"uniform mat4 u_Projection;											" \
+		"uniform mat4 u_Model;												" \
+		"																	" \
+		"																	" \
+		"varying vec2 v_TexCoord;											" \
+		"																	" \
+		"void main()														" \
+		"{																	" \
 		" gl_Position = u_Projection * u_Model * vec4(a_Position, 1.0);		" \
-		" v_TexCoord = a_TexCoord;														" \
-		"}																				" \
-		"																				";
+		" v_TexCoord = a_TexCoord;											" \
+		"}																	" \
+		"																	";
 
 	//*****************************************************
 	//	CREATE UI FRAGMENT SHADER 
 	//*****************************************************
 	const GLchar* fragShaderUI =
-		"uniform sampler2D u_Texture;									" \
-		"varying vec2 v_TexCoord;										" \
-		"																" \
-		"void main()													" \
-		"{																" \
-		" vec4 tex = texture2D(u_Texture, v_TexCoord);					" \
-		" gl_FragColor = tex;											" \
-		"}																";
+		"uniform sampler2D u_Texture;					" \
+		"varying vec2 v_TexCoord;						" \
+		"												" \
+		"void main()									" \
+		"{												" \
+		" vec4 tex = texture2D(u_Texture, v_TexCoord);	" \
+		" gl_FragColor = tex;							" \
+		"}												";
 
 	std::shared_ptr<ShaderProgram> shaderUI = std::make_shared<ShaderProgram>();
 	shaderUI->CreateShader(vertShaderUI, fragShaderUI);
@@ -609,7 +591,6 @@ int main()
 		int height = 0;
 
 		glEnable(GL_DEPTH_TEST);
-		//glEnable(GL_CULL_FACE);	// Shows the triangles separately
 
 		SDL_GetWindowSize(window, &width, &height);
 
@@ -869,9 +850,6 @@ int main()
 		// Drawing
 		// Instruct OpenGL to use our shader program and our VAO
 		glUseProgram(shaders.at(shaderSelector)->getId());
-		//glBindVertexArray(vao->getId());
-		// Cat:
-		//glBindTexture(GL_TEXTURE_2D, data->GetId());
 		glBindTexture(GL_TEXTURE_2D, modelTextures.at(modelSelector)->GetId());
 		glBindVertexArray(models.at(modelSelector)->getId());
 
@@ -879,27 +857,21 @@ int main()
 		//	PERSPECTIVE PATH
 		//*****************************************************
 
-		/* Lab 3 - Start */
 		// Prepare the perspective projection matrix
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f),
 			(float)width / (float)height, 0.1f, 100.0f);
 
 		//	MODEL MATRIX  //
-
 		// Prepare the model matrix
 		glm::mat4 model(1.0f);
-		//model = glm::rotate(model, glm::radians(rot), glm::vec3(0, 1, 0));
 		model = glm::translate(model, glm::vec3(0, 0, 0));
 		model = glm::scale(model, glm::vec3(scale, scale, scale));
-
-		//glm::vec3 diff = glm::vec3(model * glm::vec4(0, 0, 0, 1));
 
 		// Upload the model matrix
 		glUniformMatrix4fv(modelLocs.at(shaderSelector), 1, GL_FALSE, glm::value_ptr(model));
 
 
 		//	VIEW MATRIX  //
-
 		// If we do rotate then translate, it will look like it will orbit around the model
 		glm::mat4 view(1.0f);
 		if (rotateOn)
@@ -928,11 +900,8 @@ int main()
 		// Make sure the current program is bound
 		// Upload the projection matrix
 		glUniformMatrix4fv(projectionLocs.at(shaderSelector), 1, GL_FALSE, glm::value_ptr(projection));
-		/* LAB 3 - End */
 
 		// Draw 3 vertices (a triangle)
-		//glDrawArrays(GL_TRIANGLES, 0, 6);
-		// Cat:
 		glDrawArrays(GL_TRIANGLES, 0, models.at(modelSelector)->getVertCount());
 
 		glDisable(GL_DEPTH_TEST);
@@ -966,7 +935,6 @@ int main()
 			glm::value_ptr(projection));
 
 		// Draw shape as before
-		// Draw 3 vertices (a triangle)
 		glDrawArrays(GL_TRIANGLES, 0, vao->getVertCount());
 
 		//*****************************************************
