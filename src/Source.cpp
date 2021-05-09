@@ -136,37 +136,33 @@ int main()
 	readFile.close();
 
 	//*****************************************************
-	//	[IMAGE] LEFT ARROW   
+	// UI ICONS  
 	//*****************************************************
 
-	std::shared_ptr<Texture> leftArrowTexture = std::make_shared<Texture>(stbi_load("models/leftarrow.png", &w, &h, NULL, 4), w, h);
-	std::shared_ptr<Texture> leftArrowActiveTexture = std::make_shared<Texture>(stbi_load("models/leftarrowactive.png", &w, &h, NULL, 4), w, h);
+	// Left Arrows
+	std::shared_ptr<Texture> leftArrowTexture = std::make_shared<Texture>(stbi_load("models/icons/leftarrow.png", &w, &h, NULL, 4), w, h);
+	std::shared_ptr<Texture> leftArrowActiveTexture = std::make_shared<Texture>(stbi_load("models/icons/leftarrowactive.png", &w, &h, NULL, 4), w, h);
 
-	//*****************************************************
-	//	[IMAGE] RIGHT ARROW   
-	//*****************************************************
+	// Right Arrows
+	std::shared_ptr<Texture> rightArrowTexture = std::make_shared<Texture>(stbi_load("models/icons/rightarrow.png", &w, &h, NULL, 4), w, h);
+	std::shared_ptr<Texture> rightArrowActiveTexture = std::make_shared<Texture>(stbi_load("models/icons/rightarroveactive.png", &w, &h, NULL, 4), w, h);
 
-	std::shared_ptr<Texture> rightArrowTexture = std::make_shared<Texture>(stbi_load("models/rightarrow.png", &w, &h, NULL, 4), w, h);
-	std::shared_ptr<Texture> rightArrowActiveTexture = std::make_shared<Texture>(stbi_load("models/rightarroveactive.png", &w, &h, NULL, 4), w, h);
+	// Model Icon
+	std::shared_ptr<Texture> modelIconTexture = std::make_shared<Texture>(stbi_load("models/icons/modelicon.png", &w, &h, NULL, 4), w, h);
 
-	//*****************************************************
-	//	[IMAGE] MODEL ICON
-	//*****************************************************
+	// Shader Icon
+	std::shared_ptr<Texture> shaderIconTexture = std::make_shared<Texture>(stbi_load("models/icons/shadericon.png", &w, &h, NULL, 4), w, h);
+	
+	// Rotate Icons
+	std::shared_ptr<Texture> rotateIconTexture = std::make_shared<Texture>(stbi_load("models/icons/rotate.png", &w, &h, NULL, 4), w, h);
+	std::shared_ptr<Texture> rotateActiveIconTexture = std::make_shared<Texture>(stbi_load("models/icons/rotateactive.png", &w, &h, NULL, 4), w, h);
 
-	std::shared_ptr<Texture> modelIconTexture = std::make_shared<Texture>(stbi_load("models/modelicon.png", &w, &h, NULL, 4), w, h);
+	// Scale Icons
+	std::shared_ptr<Texture> addScaleTexture = std::make_shared<Texture>(stbi_load("models/icons/add.png", &w, &h, NULL, 4), w, h);
+	std::shared_ptr<Texture> minusScaleTexture = std::make_shared<Texture>(stbi_load("models/icons/minus.png", &w, &h, NULL, 4), w, h);
 
-	//*****************************************************
-	//	[IMAGE] SHADER ICON
-	//*****************************************************
-
-	std::shared_ptr<Texture> shaderIconTexture = std::make_shared<Texture>(stbi_load("models/shadericon.png", &w, &h, NULL, 4), w, h);
-
-	//*****************************************************
-	//	[IMAGE] ROTATE ICON
-	//*****************************************************
-
-	std::shared_ptr<Texture> rotateIconTexture = std::make_shared<Texture>(stbi_load("models/rotate.png", &w, &h, NULL, 4), w, h);
-	std::shared_ptr<Texture> rotateActiveIconTexture = std::make_shared<Texture>(stbi_load("models/rotateactive.png", &w, &h, NULL, 4), w, h);
+	// Undo Icon
+	std::shared_ptr<Texture> undoTexture = std::make_shared<Texture>(stbi_load("models/icons/undo.png", &w, &h, NULL, 4), w, h);
 
 	//*****************************************************
 	//	[VERT SHADER] SPECULAR LIGHTING
@@ -556,8 +552,6 @@ int main()
 	inverseViewLocs.push_back(-1);
 	inverseViewLocs.push_back(inverseViewLocSpecular);
 
-
-
 	//*****************************************************
 	//	MAIN LOOP
 	//*****************************************************
@@ -828,21 +822,51 @@ int main()
 		}
 
 		// Rotate Icon 
-		if (intersect(mouse, glm::vec4(75, 155, 50, 50)) && mouseButtonDown && !rotateOn)
+		if (intersect(mouse, glm::vec4(45, 210, 50, 50)) && mouseButtonDown && !rotateOn)
 		{
 			rotateOn = true;
 			std::cout << "Rotate intersect True" << std::endl;
 			mouseButtonDown = false;
 		}
-		else if (intersect(mouse, glm::vec4(75, 155, 50, 50)) && mouseButtonDown && rotateOn)
+		else if (intersect(mouse, glm::vec4(45, 210, 50, 50)) && mouseButtonDown && rotateOn)
 		{
 			rotateOn = false;
 			std::cout << "Rotate intersect True" << std::endl;
 			mouseButtonDown = false;
 		}
 
-		// Set background to Cyan 
-		//glClearColor(0.0f, 0.33f, 0.5f, 1.0f);
+		// Add scale icon
+		if (intersect(mouse, glm::vec4(45, 155, 50, 50)) && mouseButtonDown)
+		{
+			scale += 0.1f;
+			std::cout << "Add scale intersect True" << std::endl;
+			mouseButtonDown = false;
+		}
+
+		// Minus scale icon
+		if (intersect(mouse, glm::vec4(115, 155, 50, 50)) && mouseButtonDown)
+		{
+			if (scale <= 0.1f)
+			{
+				scale = 0.1f;
+			}
+			else
+			{
+				scale -= 0.1f;
+			}
+			std::cout << "Minus scale intersect True" << std::endl;
+			mouseButtonDown = false;
+		}
+
+		// Undo icon
+		if (intersect(mouse, glm::vec4(115, 210, 50, 50)) && mouseButtonDown)
+		{
+			scale = 1.0f;
+			shaderSelector = 0;
+			std::cout << "Undo intersect True" << std::endl;
+			mouseButtonDown = false;
+		}
+		// Set background to grey 
 		glClearColor(0.33f, 0.33f, 0.33f, 1.0f);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -1010,9 +1034,38 @@ int main()
 			rotateIcon->Bind(rotateIconTexture->GetId(), vao->getId());
 		}
 
-		rotateIcon->SetPosition(100, height - 180, 0);
+		rotateIcon->SetPosition(70, height - 235, 0);
 		rotateIcon->SetScale(50, 50, 1);
 		rotateIcon->Draw(modelLocUI, projectionLocUI, projection, vao->getVertCount());
+
+		//*****************************************************
+		// [HUD] Add Scale Icon
+		//*****************************************************
+
+		std::shared_ptr<Model> addScaleIcon = std::make_shared<Model>();
+		addScaleIcon->Bind(addScaleTexture->GetId(), vao->getId());
+		addScaleIcon->SetPosition(70, height - 180, 0);
+		addScaleIcon->SetScale(50, 50, 1);
+		addScaleIcon->Draw(modelLocUI, projectionLocUI, projection, vao->getVertCount());
+
+		//*****************************************************
+		// [HUD] Minus Scale Icon
+		//*****************************************************
+
+		std::shared_ptr<Model> minusScaleIcon = std::make_shared<Model>();
+		minusScaleIcon->Bind(minusScaleTexture->GetId(), vao->getId());
+		minusScaleIcon->SetPosition(130, height - 180, 0);
+		minusScaleIcon->SetScale(50, 50, 1);
+		minusScaleIcon->Draw(modelLocUI, projectionLocUI, projection, vao->getVertCount());
+
+		//*****************************************************
+		// [HUD] Undo Icon
+		//*****************************************************
+		std::shared_ptr<Model> undoIcon = std::make_shared<Model>();
+		undoIcon->Bind(undoTexture->GetId(), vao->getId());
+		undoIcon->SetPosition(130, height - 235, 0);
+		undoIcon->SetScale(50, 50, 1);
+		undoIcon->Draw(modelLocUI, projectionLocUI, projection, vao->getVertCount());
 
 		//*****************************************************
 		//	RESET THE STATE

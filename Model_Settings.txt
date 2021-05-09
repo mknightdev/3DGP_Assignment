@@ -1,11 +1,8 @@
 models/curuthers/curuthers.obj
 models/curuthers/Whiskers_diffuse.png
-
 models/skeleton/skeleton.obj
 models/skeleton/skeleton_diffuse.png
-
 models/croc/croc.obj
 models/croc/croc_diffuse.png
-
 models/imp/imp.obj
 models/imp/imp_diffuse.png
