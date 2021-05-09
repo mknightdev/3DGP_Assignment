@@ -22,6 +22,7 @@
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
+// Function to return if the mouse click is within the rectangle's coordinates.
 bool intersect(glm::vec2 mouse, glm::vec4 rectangle)
 {
 	if (mouse.x < rectangle.x)
@@ -106,7 +107,7 @@ int main()
 	vao->setBuffer(1, texturesVbo);
 
 	//*****************************************************
-	//	OBTAIN OBJECTS
+	//	OBTAIN OBJECTS FROM FILE
 	//*****************************************************
 
 	int w = 0;
@@ -124,10 +125,15 @@ int main()
 
 	while (readFile >> modelObject >> modelTextures)
 	{
+		// Display file paths in the console. 
 		std::cout << modelObject << std::endl;
 		std::cout << modelTextures << std::endl;
+
+		// Create shared_ptr for both objects.
 		std::shared_ptr<VertexArray> object = std::make_shared<VertexArray>(modelObject);
 		std::shared_ptr<Texture> texture = std::make_shared<Texture>(modelTextures, w, h);
+
+		// Push the objects into a vector to cycle through during runtime. 
 		models.push_back(object);
 		textures.push_back(texture);
 	}
@@ -139,13 +145,11 @@ int main()
 	// UI ICONS  
 	//*****************************************************
 
-	// Left Arrows
+	// Left Arrow
 	std::shared_ptr<Texture> leftArrowTexture = std::make_shared<Texture>(stbi_load("models/icons/leftarrow.png", &w, &h, NULL, 4), w, h);
-	std::shared_ptr<Texture> leftArrowActiveTexture = std::make_shared<Texture>(stbi_load("models/icons/leftarrowactive.png", &w, &h, NULL, 4), w, h);
 
-	// Right Arrows
+	// Right Arrow
 	std::shared_ptr<Texture> rightArrowTexture = std::make_shared<Texture>(stbi_load("models/icons/rightarrow.png", &w, &h, NULL, 4), w, h);
-	std::shared_ptr<Texture> rightArrowActiveTexture = std::make_shared<Texture>(stbi_load("models/icons/rightarroveactive.png", &w, &h, NULL, 4), w, h);
 
 	// Model Icon
 	std::shared_ptr<Texture> modelIconTexture = std::make_shared<Texture>(stbi_load("models/icons/modelicon.png", &w, &h, NULL, 4), w, h);
@@ -557,23 +561,14 @@ int main()
 	//*****************************************************
 	bool stopped = false;
 
-	float angle = 0;
-	float xPos = 0;
-	float yPos = 1;
-
 	float rot = 0;
 	float deltaTime = 0.0001f;
 	float prevTime = 0;
-
-	float pos = 0;
-	float speed = 1.0f;
 
 	int modelSelector = 0;
 	int shaderSelector = 0;
 
 	float scale = 1.0f;
-
-	glm::vec3 camPos(0, 0, 15);
 
 	glm::vec2 mouse(0, 0);
 	bool mouseButtonDown = false;
@@ -598,121 +593,6 @@ int main()
 			if (event.type == SDL_QUIT)
 			{
 				stopped = true;
-			}
-			else if (event.type == SDL_KEYDOWN)
-			{
-				switch (event.key.keysym.sym)
-				{
-				case SDLK_a:
-					std::cout << "A Key Pressed" << std::endl;
-
-					if (modelSelector == 0)
-					{
-						/* if selector equals zero, set selector to be the value of the end of the model vector,
-						* this prevents us from going out of bounds. */
-						modelSelector = models.size() - 1;
-						std::cout << "Model Selector: " << modelSelector << std::endl;
-					}
-					else
-					{
-						// Otherwise, continue decreasing selector to view previous models.
-						modelSelector--;
-						std::cout << "Model Selector: " << modelSelector << std::endl;
-					}
-
-					break;
-				case SDLK_d:
-					std::cout << "D Key Pressed" << std::endl;
-
-					if (modelSelector == models.size() - 1)
-					{
-						/* If selector is the same as our vector of models (-1),
-						* set selector back to zero so we don't go out of bounds.*/
-						modelSelector = 0;
-						std::cout << "Model Selector: " << modelSelector << std::endl;
-					}
-					else
-					{
-						// Otherwise, continue increasing selector to view further models. 
-						modelSelector++;
-						std::cout << "Model Selector: " << modelSelector << std::endl;
-					}
-					break;
-				case SDLK_q:
-					std::cout << "Q Key Pressed" << std::endl;
-
-					if (shaderSelector == 0)
-					{
-						/* if selector equals zero, set selector to be the value of the end of the shader vector,
-						* this prevents us from going out of bounds. */
-						shaderSelector = shaders.size() - 1;
-						std::cout << "Selector: " << shaderSelector << std::endl;
-					}
-					else
-					{
-						// Otherwise, continue decreasing selector to view previous shader.
-						shaderSelector--;
-						std::cout << "Selector: " << shaderSelector << std::endl;
-					}
-
-					break;
-				case SDLK_e:
-					std::cout << "E Key Pressed" << std::endl;
-
-					if (shaderSelector == shaders.size() - 1)
-					{
-						/* If selector is the same as our vector of shader (-1),
-						* set selector back to zero so we don't go out of bounds.*/
-						shaderSelector = 0;
-						std::cout << "Selector: " << shaderSelector << std::endl;
-					}
-					else
-					{
-						// Otherwise, continue increasing selector to view further shader. 
-						shaderSelector++;
-						std::cout << "Selector: " << shaderSelector << std::endl;
-					}
-					break;
-				case SDLK_UP:
-					// Move the model up
-					std::cout << "UP Arrow" << std::endl;
-					camPos.y -= 50.0f * deltaTime;
-					break;
-				case SDLK_DOWN:
-					// Move the model down
-					std::cout << "DOWN Arrow" << std::endl;
-					camPos.y += 50.0f * deltaTime;
-					break;
-				case SDLK_LEFT:
-					// Move the model left
-					std::cout << "LEFT Arrow" << std::endl;
-					camPos.x += 50.0f * deltaTime;
-					break;
-				case SDLK_RIGHT:
-					// Move the model right
-					std::cout << "RIGHT Arrow" << std::endl;
-					camPos.x -= 50.0f * deltaTime;
-					break;
-				case SDLK_EQUALS:
-					std::cout << "Scale Increased" << std::endl;
-					scale += 0.05f;
-					break;
-				case SDLK_MINUS:
-					std::cout << "Scale Decreased" << std::endl;
-					if (scale <= 0.05f)
-					{
-						scale = 0.05f;
-					}
-					else
-					{
-						scale -= 0.05f;
-					}
-					std::cout << scale << std::endl;
-					break;
-				default:
-					std::cout << "No valid input" << std::endl;
-					break;
-				}
 			}
 			else if (event.type == SDL_MOUSEMOTION)
 			{
@@ -743,38 +623,30 @@ int main()
 				/* if selector equals zero, set selector to be the value of the end of the shader vector,
 				* this prevents us from going out of bounds. */
 				shaderSelector = shaders.size() - 1;
-				std::cout << "Selector: " << shaderSelector << std::endl;
 			}
 			else
 			{
 				// Otherwise, continue decreasing selector to view previous shader.
 				shaderSelector--;
-				std::cout << "Selector: " << shaderSelector << std::endl;
 			}
 
-			std::cout << "Left arrow intersect True" << std::endl;
 			mouseButtonDown = false;	// Prevents holding down mouse button 
 		}
 
 		// Shader Right Arrow
 		if (intersect(mouse, glm::vec4(width - 150, 450, 100, 100)) && mouseButtonDown)
 		{
-			glBindTexture(GL_TEXTURE_2D, rightArrowActiveTexture->GetId());
 			if (shaderSelector == shaders.size() - 1)
 			{
 				/* If selector is the same as our vector of shader (-1),
 				* set selector back to zero so we don't go out of bounds.*/
 				shaderSelector = 0;
-				std::cout << "Selector: " << shaderSelector << std::endl;
 			}
 			else
 			{
 				// Otherwise, continue increasing selector to view further shader. 
 				shaderSelector++;
-				std::cout << "Selector: " << shaderSelector << std::endl;
 			}
-
-			std::cout << "Right arrow intersect True" << std::endl;
 			mouseButtonDown = false;	// Prevents holding down mouse button 
 		}
 
@@ -787,16 +659,13 @@ int main()
 				/* if selector equals zero, set selector to be the value of the end of the model vector,
 				* this prevents us from going out of bounds. */
 				modelSelector = models.size() - 1;
-				std::cout << "Model Selector: " << modelSelector << std::endl;
 			}
 			else
 			{
 				// Otherwise, continue decreasing selector to view previous models.
 				modelSelector--;
-				std::cout << "Model Selector: " << modelSelector << std::endl;
 			}
 
-			std::cout << "Left arrow intersect True" << std::endl;
 			mouseButtonDown = false;	// Prevents holding down mouse button 
 		}
 
@@ -808,16 +677,13 @@ int main()
 				/* If selector is the same as our vector of models (-1),
 				* set selector back to zero so we don't go out of bounds.*/
 				modelSelector = 0;
-				std::cout << "Model Selector: " << modelSelector << std::endl;
 			}
 			else
 			{
 				// Otherwise, continue increasing selector to view further models. 
 				modelSelector++;
-				std::cout << "Model Selector: " << modelSelector << std::endl;
 			}
 
-			std::cout << "Right arrow intersect True" << std::endl;
 			mouseButtonDown = false;	// Prevents holding down mouse button 
 		}
 
@@ -825,13 +691,11 @@ int main()
 		if (intersect(mouse, glm::vec4(45, 210, 50, 50)) && mouseButtonDown && !rotateOn)
 		{
 			rotateOn = true;
-			std::cout << "Rotate intersect True" << std::endl;
 			mouseButtonDown = false;
 		}
 		else if (intersect(mouse, glm::vec4(45, 210, 50, 50)) && mouseButtonDown && rotateOn)
 		{
 			rotateOn = false;
-			std::cout << "Rotate intersect True" << std::endl;
 			mouseButtonDown = false;
 		}
 
@@ -839,7 +703,6 @@ int main()
 		if (intersect(mouse, glm::vec4(45, 155, 50, 50)) && mouseButtonDown)
 		{
 			scale += 0.1f;
-			std::cout << "Add scale intersect True" << std::endl;
 			mouseButtonDown = false;
 		}
 
@@ -854,7 +717,6 @@ int main()
 			{
 				scale -= 0.1f;
 			}
-			std::cout << "Minus scale intersect True" << std::endl;
 			mouseButtonDown = false;
 		}
 
@@ -863,7 +725,6 @@ int main()
 		{
 			scale = 1.0f;
 			shaderSelector = 0;
-			std::cout << "Undo intersect True" << std::endl;
 			mouseButtonDown = false;
 		}
 		// Set background to grey 
@@ -909,7 +770,6 @@ int main()
 		}
 
 		view = glm::translate(view, glm::vec3(0, 0, 15));
-		//view = glm::translate(view, camPos);
 		glUniformMatrix4fv(viewLocs.at(shaderSelector), 1, GL_FALSE, glm::value_ptr(glm::inverse(view)));
 
 		if (inverseViewLocs.at(shaderSelector) != -1)

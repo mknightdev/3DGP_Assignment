@@ -5,8 +5,8 @@
 
 Texture::Texture(unsigned char* image, int x, int y)
 {
-	w = x;
-	h = y;
+	width = x;
+	height = y;
 	glGenTextures(1, &id);
 
 	if (!id)
@@ -17,7 +17,7 @@ Texture::Texture(unsigned char* image, int x, int y)
 	glBindTexture(GL_TEXTURE_2D, id);
 
 	// Upload the image data to the bound texture unit in the GPU
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
 		GL_UNSIGNED_BYTE, image);
 
 	// Free the loaded data because we now have a copy on the GPU
@@ -33,11 +33,11 @@ Texture::Texture(unsigned char* image, int x, int y)
 
 Texture::Texture(std::string fileName, int x, int y)
 {
-	w = x;
-	h = y;
+	width = x;
+	height = y;
 
 	const char* image = fileName.c_str();
-	data = stbi_load(image, &w, &h, NULL, 4);
+	data = stbi_load(image, &width, &height, NULL, 4);
 
 	glGenTextures(1, &id);
 
@@ -49,7 +49,7 @@ Texture::Texture(std::string fileName, int x, int y)
 	glBindTexture(GL_TEXTURE_2D, id);
 
 	// Upload the image data to the bound texture unit in the GPU
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
 		GL_UNSIGNED_BYTE, data);
 
 	// Free the loaded data because we now have a copy on the GPU
