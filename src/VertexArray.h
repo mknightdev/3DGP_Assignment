@@ -27,6 +27,13 @@ public:
 	/// @see VertexArray()
 	VertexArray(std::string path);
 
+
+	/// Vertex Array deconstructor
+	///
+	/// Deconstructor to clean up memory to prevent any leaks.
+	/// It deletes the vertex array using glDeleteVertexArrays.
+	~VertexArray();
+
 	/// Sets the buffer. 
 	/// 
 	/// A function to set the buffer of the vertex array object with the integer location and 

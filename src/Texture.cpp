@@ -62,6 +62,11 @@ Texture::Texture(std::string fileName, int x, int y)
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+Texture::~Texture()
+{
+	glDeleteTextures(1, &id);
+}
+
 GLuint Texture::GetId()
 {
 	return id;

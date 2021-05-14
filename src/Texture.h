@@ -30,6 +30,12 @@ public:
 	/// @see Texture(unsigned char* image, int x, int y)
 	Texture(std::string fileName, int x, int y);
 
+	/// Texture deconstructor
+	///
+	/// Deconstructor to clean up memory to prevent any leaks.
+	/// It deletes the generated textures using glDeleteTextures.
+	~Texture();
+
 	/// Returns the id of the current texture.
 	/// 
 	/// Gets the GLuint of the current texture object and returns it. 
