@@ -57,7 +57,6 @@ public:
 	/// @returns void 
 	/// @attention This is the size_t vao version!
 	/// @see Draw(GLint modelLoc, GLint projectionLoc, glm::mat4 projection, GLsizei vao)
-
 	void Draw(GLint modelLoc, GLint projectionLoc, glm::mat4 projection, size_t vao);
 
 	/// Enables the drawing of the model.
@@ -70,7 +69,6 @@ public:
 	/// @returns void 
 	/// @attention This is the GLsizei vao version!
 	/// @see Draw(GLint modelLoc, GLint projectionLoc, glm::mat4 projection, size_t vao)
-
 	void Draw(GLint modelLoc, GLint projectionLoc, glm::mat4 projection, GLsizei vao);
 
 	/// Returns the current model object. 

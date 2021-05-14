@@ -29,6 +29,11 @@ VertexArray::VertexArray()
 	buffers.resize(20);
 }
 
+VertexArray::~VertexArray()
+{
+	glDeleteVertexArrays(1, &id);
+}
+
 size_t VertexArray::getVertCount()
 {
 	return vertCount;

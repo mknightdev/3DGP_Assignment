@@ -12,8 +12,8 @@ GLuint ShaderProgram::getId()
 void ShaderProgram::CreateShader(const GLchar* vertSrc, const GLchar* fragSrc)
 {
 	// Get shader source. 
-	GLuint vertShader = GetSource(vertSrc, GL_VERTEX_SHADER);
-	GLuint fragShader = GetSource(fragSrc, GL_FRAGMENT_SHADER);
+	vertShader = GetSource(vertSrc, GL_VERTEX_SHADER);
+	fragShader = GetSource(fragSrc, GL_FRAGMENT_SHADER);
 
 	// Create a program for the shaders.
 	programID = glCreateProgram();

@@ -31,4 +31,6 @@ public:
 	void CreateShader(const GLchar* vertSrc, const GLchar* fragSrc);
 private:
 	GLuint programID;
+	GLuint vertShader;
+	GLuint fragShader;
 };
