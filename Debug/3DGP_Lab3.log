@@ -1,3 +1,4 @@
-﻿  Source.cpp
-F:\Programming\Repos\3DGP_Lab3\3DGP_Lab3\src\Source.cpp(795,18): warning C4244: 'initializing': conversion from 'Uint32' to 'float', possible loss of data
-  3DGP_Lab3.vcxproj -> F:\Programming\Repos\3DGP_Lab3\Debug\3DGP_Lab3.exe
+﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(491,5): warning MSB8028: The intermediate directory (Debug\) contains files shared from another project (3DGP_Lab3.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+  Source.cpp
+F:\Programming\Repos\3DGP_Lab3\3DGP_Lab3\src\Source.cpp(612,18): warning C4244: 'initializing': conversion from 'Uint32' to 'float', possible loss of data
+  3DGP_Lab3.vcxproj -> F:\Programming\Repos\3DGP_Lab3\Debug\3DGP_Assignment.exe
